@@ -63,10 +63,13 @@ import { cn } from "@/lib/utils";
 const navItems = [
   { label: "Inicio", href: "#inicio" },
   { label: "Servicios", href: "#servicios" },
+  { label: "Proceso", href: "#proceso" },
   { label: "Precios", href: "#planes" },
-  { label: "Sobre nosotros", href: "#proceso" },
+  { label: "Clientes", href: "#clientes" },
+  { label: "Launch", href: "#launch" },
+  { label: "Compliance", href: "#compliance" },
+  { label: "Contacto", href: "#lead-form" },
   { label: "Recursos", href: "#faqs" },
-  { label: "Contacto", href: "#contacto" },
 ];
 
 const heroBadges = [
@@ -108,19 +111,6 @@ const residenceCountries = [
   "España",
   "Otro",
 ];
-
-const flagStyles: Record<string, string> = {
-  pa: "linear-gradient(90deg, #ffffff 0 50%, #d21034 50% 100%)",
-  us: "repeating-linear-gradient(to bottom, #b22234 0 2px, #ffffff 2px 4px)",
-  co: "linear-gradient(to bottom, #fcd116 0 50%, #003893 50% 75%, #ce1126 75% 100%)",
-  mx: "linear-gradient(90deg, #006847 0 33%, #ffffff 33% 66%, #ce1126 66% 100%)",
-  cl: "linear-gradient(to bottom, #ffffff 0 50%, #d52b1e 50% 100%)",
-  pe: "linear-gradient(90deg, #d91023 0 33%, #ffffff 33% 66%, #d91023 66% 100%)",
-  ar: "linear-gradient(to bottom, #75aadb 0 33%, #ffffff 33% 66%, #75aadb 66% 100%)",
-  ec: "linear-gradient(to bottom, #ffdd00 0 50%, #034ea2 50% 75%, #ed1c24 75% 100%)",
-  do: "linear-gradient(90deg, #002d62 0 45%, #ffffff 45% 55%, #ce1126 55% 100%)",
-  es: "linear-gradient(to bottom, #aa151b 0 25%, #f1bf00 25% 75%, #aa151b 75% 100%)",
-};
 
 const audienceColumns = [
   {
@@ -227,6 +217,97 @@ const planBenefits = [
     title: "Ahorra tiempo",
     body: "Nosotros hacemos el trabajo para que tú te enfoques en crecer.",
     icon: Clock3,
+  },
+];
+
+const launchIncludes = [
+  {
+    title: "Constitución de tu LLC",
+    body: "Creamos tu empresa en Estados Unidos correctamente desde el inicio.",
+    icon: Building2,
+  },
+  {
+    title: "EIN (Tax ID)",
+    body: "Solicitamos tu número de identificación fiscal para operar, facturar y abrir cuentas.",
+    icon: BadgeCheck,
+  },
+  {
+    title: "BOI Report (FinCEN)",
+    body: "Registro obligatorio para cumplir con regulaciones federales.",
+    icon: FileCheck2,
+  },
+  {
+    title: "Registered Agent",
+    body: "Representante legal en Estados Unidos para recibir notificaciones oficiales.",
+    icon: ShieldCheck,
+  },
+  {
+    title: "Operating Agreement",
+    body: "Documento interno que define la estructura y funcionamiento de tu empresa.",
+    icon: FileText,
+  },
+  {
+    title: "Acompañamiento paso a paso",
+    body: "Te guiamos en todo el proceso, sin tecnicismos ni complicaciones.",
+    icon: Headphones,
+  },
+  {
+    title: "Soporte en español",
+    body: "Atención clara y directa para resolver cualquier duda.",
+    icon: MessageCircle,
+  },
+];
+
+const complianceIncludes = [
+  {
+    title: "Evita multas de hasta $25,000 del IRS",
+    body: "Preparamos y presentamos correctamente los formularios fiscales 5472 y 1120, evitando errores y sanciones.",
+    icon: ShieldCheck,
+  },
+  {
+    title: "Cumplimiento federal IRS + FinCEN sin riesgo",
+    body: "Gestionamos y actualizamos tu Beneficial Ownership Information Report.",
+    icon: FileCheck2,
+  },
+  {
+    title: "Tu empresa siempre activa y en cumplimiento",
+    body: "Recordatorios de obligaciones para mantener tu LLC al día ante entidades estadounidenses.",
+    icon: CalendarCheck,
+  },
+  {
+    title: "Nunca pierdas una fecha importante",
+    body: "Alertas claras y seguimiento organizado para que cumplas antes de cada vencimiento.",
+    icon: Clock3,
+  },
+  {
+    title: "Renovación anual de Registered Agent incluida",
+    body: "Tu representante legal se mantiene activo para recibir notificaciones oficiales.",
+    icon: BadgeCheck,
+  },
+  {
+    title: "Acompañamiento ante requerimientos oficiales",
+    body: "Te guiamos paso a paso si recibes comunicaciones del IRS u otras entidades.",
+    icon: Headphones,
+  },
+  {
+    title: "Revisión inteligente de correspondencia",
+    body: "Analizamos documentos importantes y te explicamos cualquier acción necesaria.",
+    icon: Mail,
+  },
+  {
+    title: "Soporte continuo en español",
+    body: "Atención clara, directa y en tu idioma, sin tecnicismos innecesarios.",
+    icon: MessageCircle,
+  },
+  {
+    title: "Asesoría para apertura de cuentas bancarias en EE. UU.",
+    body: "Te orientamos para que puedas operar tu empresa sin fricciones.",
+    icon: Landmark,
+  },
+  {
+    title: "Integración de pasarelas de pago internacionales",
+    body: "Te orientamos sobre herramientas como Stripe para operar globalmente.",
+    icon: CircleDollarSign,
   },
 ];
 
@@ -350,30 +431,15 @@ function SectionReveal({
 
 function LogoMark({ dark = false }: { dark?: boolean }) {
   return (
-    <a href="#inicio" className="flex items-center gap-3" aria-label="Craghill Advisory">
-      <span
-        className={cn(
-          "grid size-11 place-items-center rounded-lg border",
-          dark
-            ? "border-white/15 bg-white/5"
-            : "border-primary/30 bg-primary/10"
-        )}
-      >
-        <span className="block size-5 rotate-45 rounded-[3px] border-b-4 border-l-4 border-primary" />
-      </span>
-      <span className="flex flex-col leading-none">
-        <span
-          className={cn(
-            "text-lg font-bold tracking-[0.12em]",
-            dark ? "text-white" : "text-foreground"
-          )}
-        >
-          CRAGHILL
-        </span>
-        <span className="text-sm font-semibold tracking-[0.18em] text-primary">
-          ADVISORY
-        </span>
-      </span>
+    <a href="#inicio" className="block" aria-label="Craghill Advisory">
+      <Image
+        src="/logo-web-craghill.svg"
+        alt="Craghill Advisory"
+        width={210}
+        height={72}
+        className={cn("h-12 w-auto", dark ? "brightness-0 invert" : "")}
+        priority
+      />
     </a>
   );
 }
@@ -453,9 +519,9 @@ function ScheduleButton({
 function FlagSwatch({ iso }: { iso: string }) {
   return (
     <span
-      className="block h-[18px] w-6 rounded-[2px] border border-foreground/10 shadow-sm"
+      className="block h-[18px] w-6 rounded-[2px] border border-foreground/10 bg-cover bg-center shadow-sm"
       style={{
-        background: flagStyles[iso] ?? "linear-gradient(135deg, #e5e7eb, #fff)",
+        backgroundImage: `url(/flags/${iso}.svg)`,
       }}
       aria-hidden="true"
     />
@@ -518,7 +584,7 @@ function ScheduleDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[90vh] overflow-y-auto p-6 sm:max-w-2xl">
+      <DialogContent className="max-h-[90vh] overflow-y-auto bg-white p-6 shadow-[0_24px_80px_rgba(23,50,69,0.22)] sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold text-foreground">
             Agenda tu consulta
@@ -583,7 +649,7 @@ function ScheduleDialog({
                 >
                   {phoneCountries.map((country) => (
                     <option key={country.id} value={country.id}>
-                      {country.flag} {country.code} {country.label}
+                      {country.code} {country.label}
                     </option>
                   ))}
                 </select>
@@ -827,14 +893,14 @@ export function LandingPage() {
   return (
     <main id="inicio" className="min-h-screen bg-background text-foreground">
       <header className="sticky top-0 z-50 border-b border-border/70 bg-white/92 backdrop-blur">
-        <div className="mx-auto flex h-20 w-full max-w-7xl items-center justify-between px-5 lg:px-8">
+        <div className="mx-auto flex h-20 w-full max-w-[1500px] items-center justify-between gap-5 px-5 lg:px-8">
           <LogoMark />
-          <nav className="hidden items-center gap-8 lg:flex">
+          <nav className="hidden items-center gap-5 xl:gap-7 lg:flex">
             {navItems.map((item) => (
               <a
                 key={item.href}
                 href={item.href}
-                className="relative text-sm font-semibold text-foreground/80 transition hover:text-foreground"
+                className="relative whitespace-nowrap text-sm font-semibold text-foreground/80 transition hover:text-foreground"
               >
                 {item.label}
               </a>
@@ -887,7 +953,7 @@ export function LandingPage() {
       </header>
 
       <section className="relative overflow-hidden bg-white">
-        <div className="grid min-h-[680px] w-full items-center gap-10 px-5 py-16 lg:grid-cols-[minmax(2rem,1fr)_minmax(400px,560px)_minmax(0,760px)] lg:gap-0 lg:px-0 lg:py-20">
+        <div className="grid min-h-[700px] w-full items-center gap-10 px-5 py-16 lg:grid-cols-[minmax(2rem,calc((100vw-1280px)/2+2rem))_minmax(420px,560px)_minmax(0,1fr)] lg:gap-0 lg:px-0 lg:py-20">
           <motion.div
             initial={{ opacity: 0, y: 22 }}
             animate={{ opacity: 1, y: 0 }}
@@ -931,15 +997,15 @@ export function LandingPage() {
             initial={{ opacity: 0, scale: 1.02 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.9, ease: "easeOut", delay: 0.1 }}
-            className="relative min-h-[420px] overflow-hidden rounded-none lg:col-start-3 lg:min-h-[560px]"
+            className="relative min-h-[460px] overflow-hidden rounded-none lg:col-start-3 lg:min-h-[620px]"
           >
             <Image
               src="/hero-placeholder.png"
               alt="Asesor trabajando remotamente en una oficina luminosa"
               fill
               priority
-              className="object-cover object-left"
-              sizes="(min-width: 1024px) 42vw, 100vw"
+              className="object-cover object-center"
+              sizes="(min-width: 1024px) 62vw, 100vw"
             />
             <div className="pointer-events-none absolute inset-y-0 left-0 w-1/3 bg-gradient-to-r from-white to-transparent" />
             <div className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-white to-transparent" />
@@ -947,7 +1013,7 @@ export function LandingPage() {
         </div>
       </section>
 
-      <SectionReveal id="servicios" className="bg-secondary py-16">
+      <SectionReveal id="servicios" className="scroll-mt-24 bg-secondary py-16">
         <div className="mx-auto grid max-w-7xl gap-10 px-5 lg:grid-cols-3 lg:px-8">
           {audienceColumns.map((column) => (
             <div key={column.title} className="flex flex-col gap-5">
@@ -980,7 +1046,7 @@ export function LandingPage() {
         </div>
       </SectionReveal>
 
-      <SectionReveal id="proceso" className="bg-white py-16">
+      <SectionReveal id="proceso" className="scroll-mt-24 bg-white py-16">
         <div className="mx-auto max-w-7xl px-5 lg:px-8">
           <h2 className="text-center text-3xl font-bold text-foreground">
             Un proceso claro, simple y <span className="text-primary">100% remoto</span>
@@ -1010,7 +1076,7 @@ export function LandingPage() {
         </div>
       </SectionReveal>
 
-      <SectionReveal id="planes" className="bg-white pb-16">
+      <SectionReveal id="planes" className="scroll-mt-24 bg-white pb-16">
         <div className="mx-auto max-w-7xl px-5 lg:px-8">
           <h2 className="text-center text-3xl font-bold text-foreground">
             Planes simples y transparentes
@@ -1086,7 +1152,7 @@ export function LandingPage() {
         </div>
       </SectionReveal>
 
-      <SectionReveal className="bg-white pb-16">
+      <SectionReveal id="clientes" className="scroll-mt-24 bg-white pb-16">
         <div className="mx-auto max-w-7xl px-5 lg:px-8">
           <h2 className="text-center text-3xl font-bold text-foreground">
             Lo que dicen nuestros clientes
@@ -1130,6 +1196,103 @@ export function LandingPage() {
         </div>
       </SectionReveal>
 
+      <SectionReveal id="launch" className="scroll-mt-24 bg-white py-16">
+        <div className="mx-auto max-w-5xl px-5 lg:px-8">
+          <div className="flex justify-center">
+            <Image
+              src="/badge-llc.png"
+              alt="Craghill Advisory LLC Formation Certified"
+              width={220}
+              height={220}
+              className="h-44 w-auto object-contain"
+            />
+          </div>
+          <div className="mt-8 text-center">
+            <h2 className="text-3xl font-bold text-foreground">
+              ¿Qué incluye el <span className="text-primary">plan launch?</span>
+            </h2>
+            <p className="mx-auto mt-3 max-w-2xl text-sm font-medium leading-7 text-muted-foreground">
+              Todo lo que necesitas para crear y operar tu LLC en Estados Unidos de forma clara, segura y 100% remota.
+            </p>
+          </div>
+          <div className="mt-8 grid gap-4 rounded-lg border border-primary/30 bg-white p-4 shadow-sm md:grid-cols-2">
+            {launchIncludes.map((item) => {
+              const Icon = item.icon;
+              return (
+                <div key={item.title} className="flex gap-4 rounded-md border border-primary/15 bg-background p-4">
+                  <span className="grid size-10 shrink-0 place-items-center rounded-full bg-accent text-primary">
+                    <Icon className="size-5" />
+                  </span>
+                  <div>
+                    <h3 className="text-sm font-bold text-foreground">{item.title}</h3>
+                    <p className="mt-1 text-xs font-medium leading-6 text-muted-foreground">
+                      {item.body}
+                    </p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </SectionReveal>
+
+      <SectionReveal id="compliance" className="scroll-mt-24 bg-white py-16">
+        <div className="mx-auto max-w-5xl px-5 lg:px-8">
+          <div className="flex justify-center">
+            <Image
+              src="/badge-compliance.png"
+              alt="Craghill Advisory Compliance Verified"
+              width={240}
+              height={240}
+              className="h-52 w-auto object-contain"
+            />
+          </div>
+          <div className="mt-8 rounded-lg border border-primary/25 bg-white p-8 text-center shadow-sm">
+            <span className="mx-auto grid size-12 place-items-center rounded-full bg-accent text-primary">
+              <ShieldCheck className="size-6" />
+            </span>
+            <h2 className="mt-4 text-3xl font-bold leading-tight text-foreground">
+              Protege tu empresa. Mantente en regla.{" "}
+              <span className="text-primary">Crece sin preocupaciones.</span>
+            </h2>
+            <p className="mx-auto mt-3 max-w-3xl text-sm font-medium leading-7 text-muted-foreground">
+              Nos encargamos del cumplimiento legal y operativo en Estados Unidos, para que tú te enfoques en hacer crecer tu negocio.
+            </p>
+          </div>
+          <div className="mt-5 rounded-lg border border-primary/30 bg-white p-4 shadow-sm">
+            <h3 className="py-3 text-center text-sm font-bold text-foreground">
+              Todo lo que incluye tu <span className="text-primary">suscripción</span>
+            </h3>
+            <div className="grid gap-4 md:grid-cols-2">
+              {complianceIncludes.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <div key={item.title} className="flex gap-4 rounded-md border border-primary/15 bg-background p-4">
+                    <span className="grid size-10 shrink-0 place-items-center rounded-full bg-accent text-primary">
+                      <Icon className="size-5" />
+                    </span>
+                    <div>
+                      <h4 className="text-sm font-bold text-foreground">{item.title}</h4>
+                      <p className="mt-1 text-xs font-medium leading-6 text-muted-foreground">
+                        {item.body}
+                      </p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+            <div className="mt-4 rounded-md border border-primary/30 bg-primary/5 p-4 text-center">
+              <h4 className="text-sm font-bold text-foreground">
+                Tu tranquilidad no es opcional. Es parte del servicio.
+              </h4>
+              <p className="mt-1 text-xs font-medium leading-6 text-muted-foreground">
+                Nos encargamos del cumplimiento para que tu LLC esté siempre al día.
+              </p>
+            </div>
+          </div>
+        </div>
+      </SectionReveal>
+
       <SectionReveal id="lead-form" className="scroll-mt-24 bg-secondary py-16">
         <div className="mx-auto grid max-w-7xl gap-10 px-5 lg:grid-cols-[0.8fr_1.2fr] lg:px-8">
           <div className="flex flex-col justify-center gap-5">
@@ -1149,7 +1312,7 @@ export function LandingPage() {
         </div>
       </SectionReveal>
 
-      <SectionReveal id="faqs" className="bg-white py-16">
+      <SectionReveal id="faqs" className="scroll-mt-24 bg-white py-16">
         <div className="mx-auto max-w-7xl px-5 lg:px-8">
           <h2 className="text-center text-3xl font-bold text-foreground">
             Preguntas frecuentes
