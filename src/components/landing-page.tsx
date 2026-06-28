@@ -48,6 +48,13 @@ import {
   FieldGroup,
   FieldLabel,
 } from "@/components/ui/field";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
@@ -68,6 +75,52 @@ const heroBadges = [
   "Soporte en español",
   "Cumplimiento continuo",
 ];
+
+const phoneCountries = [
+  { id: "pa", label: "Panamá", code: "+507", flag: "🇵🇦", iso: "pa" },
+  { id: "us", label: "Estados Unidos", code: "+1", flag: "🇺🇸", iso: "us" },
+  { id: "co", label: "Colombia", code: "+57", flag: "🇨🇴", iso: "co" },
+  { id: "mx", label: "México", code: "+52", flag: "🇲🇽", iso: "mx" },
+  { id: "cl", label: "Chile", code: "+56", flag: "🇨🇱", iso: "cl" },
+  { id: "pe", label: "Perú", code: "+51", flag: "🇵🇪", iso: "pe" },
+  { id: "ar", label: "Argentina", code: "+54", flag: "🇦🇷", iso: "ar" },
+  { id: "ec", label: "Ecuador", code: "+593", flag: "🇪🇨", iso: "ec" },
+  {
+    id: "do",
+    label: "República Dominicana",
+    code: "+1",
+    flag: "🇩🇴",
+    iso: "do",
+  },
+  { id: "es", label: "España", code: "+34", flag: "🇪🇸", iso: "es" },
+];
+
+const residenceCountries = [
+  "Panamá",
+  "Estados Unidos",
+  "Colombia",
+  "México",
+  "Chile",
+  "Perú",
+  "Argentina",
+  "Ecuador",
+  "República Dominicana",
+  "España",
+  "Otro",
+];
+
+const flagStyles: Record<string, string> = {
+  pa: "linear-gradient(90deg, #ffffff 0 50%, #d21034 50% 100%)",
+  us: "repeating-linear-gradient(to bottom, #b22234 0 2px, #ffffff 2px 4px)",
+  co: "linear-gradient(to bottom, #fcd116 0 50%, #003893 50% 75%, #ce1126 75% 100%)",
+  mx: "linear-gradient(90deg, #006847 0 33%, #ffffff 33% 66%, #ce1126 66% 100%)",
+  cl: "linear-gradient(to bottom, #ffffff 0 50%, #d52b1e 50% 100%)",
+  pe: "linear-gradient(90deg, #d91023 0 33%, #ffffff 33% 66%, #d91023 66% 100%)",
+  ar: "linear-gradient(to bottom, #75aadb 0 33%, #ffffff 33% 66%, #75aadb 66% 100%)",
+  ec: "linear-gradient(to bottom, #ffdd00 0 50%, #034ea2 50% 75%, #ed1c24 75% 100%)",
+  do: "linear-gradient(90deg, #002d62 0 45%, #ffffff 45% 55%, #ce1126 55% 100%)",
+  es: "linear-gradient(to bottom, #aa151b 0 25%, #f1bf00 25% 75%, #aa151b 75% 100%)",
+};
 
 const audienceColumns = [
   {
@@ -252,6 +305,24 @@ const initialFormState: FormState = {
   message: "",
 };
 
+type ScheduleFormState = {
+  fullName: string;
+  email: string;
+  countryCode: string;
+  phone: string;
+  residenceCountry: string;
+  message: string;
+};
+
+const initialScheduleForm: ScheduleFormState = {
+  fullName: "",
+  email: "",
+  countryCode: "pa",
+  phone: "",
+  residenceCountry: "Panamá",
+  message: "",
+};
+
 function SectionReveal({
   children,
   className,
@@ -338,6 +409,269 @@ function CtaLink({
       {children}
       <ArrowRight className="size-4" aria-hidden="true" />
     </a>
+  );
+}
+
+function ScheduleButton({
+  children,
+  variant = "primary",
+  className,
+  onClick,
+}: {
+  children: React.ReactNode;
+  variant?: "primary" | "outline" | "light";
+  className?: string;
+  onClick: () => void;
+}) {
+  const styles = {
+    primary:
+      "bg-primary text-primary-foreground hover:bg-[var(--brand-strong)]",
+    outline:
+      "border-border bg-background text-foreground hover:border-primary hover:bg-accent",
+    light:
+      "bg-white text-foreground hover:bg-white/90",
+  };
+
+  return (
+    <Button
+      type="button"
+      variant={variant === "outline" ? "outline" : "default"}
+      size="lg"
+      onClick={onClick}
+      className={cn(
+        "h-11 min-w-40 gap-2 rounded-md px-5 shadow-sm",
+        styles[variant],
+        className
+      )}
+    >
+      {children}
+      <ArrowRight data-icon="inline-end" />
+    </Button>
+  );
+}
+
+function FlagSwatch({ iso }: { iso: string }) {
+  return (
+    <span
+      className="block h-[18px] w-6 rounded-[2px] border border-foreground/10 shadow-sm"
+      style={{
+        background: flagStyles[iso] ?? "linear-gradient(135deg, #e5e7eb, #fff)",
+      }}
+      aria-hidden="true"
+    />
+  );
+}
+
+function ScheduleDialog({
+  open,
+  onOpenChange,
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}) {
+  const [form, setForm] = useState<ScheduleFormState>(initialScheduleForm);
+  const [sentChannel, setSentChannel] = useState<"whatsapp" | "email" | null>(
+    null
+  );
+  const selectedPhoneCountry =
+    phoneCountries.find((country) => country.id === form.countryCode) ??
+    phoneCountries[0];
+  const selectClassName =
+    "h-10 w-full rounded-md border border-input bg-background px-3 text-sm text-foreground outline-none transition focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50";
+
+  function buildScheduleMessage() {
+    return [
+      "Nueva consulta desde Craghill Advisory",
+      "",
+      `Nombre y apellido: ${form.fullName}`,
+      `Correo: ${form.email}`,
+      `Celular: ${selectedPhoneCountry.code} ${form.phone}`,
+      `País de residencia: ${form.residenceCountry}`,
+      `Mensaje: ${form.message || "Sin mensaje adicional"}`,
+    ].join("\n");
+  }
+
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    const submitter = (event.nativeEvent as SubmitEvent)
+      .submitter as HTMLButtonElement | null;
+    const channel =
+      submitter?.value === "email" ? ("email" as const) : ("whatsapp" as const);
+    const message = buildScheduleMessage();
+
+    if (channel === "whatsapp") {
+      window.open(
+        `https://wa.me/5071234567?text=${encodeURIComponent(message)}`,
+        "_blank",
+        "noopener,noreferrer"
+      );
+    } else {
+      window.location.href = `mailto:hola@craghilladvisory.com?subject=${encodeURIComponent(
+        "Consulta Craghill Advisory"
+      )}&body=${encodeURIComponent(message)}`;
+    }
+
+    setSentChannel(channel);
+    setForm(initialScheduleForm);
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-h-[90vh] overflow-y-auto p-6 sm:max-w-2xl">
+        <DialogHeader>
+          <DialogTitle className="text-2xl font-bold text-foreground">
+            Agenda tu consulta
+          </DialogTitle>
+          <DialogDescription className="leading-6">
+            Déjanos tus datos y elige si prefieres enviarlos por WhatsApp o por
+            correo electrónico.
+          </DialogDescription>
+        </DialogHeader>
+
+        <form onSubmit={handleSubmit} className="grid gap-5">
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Field>
+              <FieldLabel htmlFor="schedule-full-name">
+                Nombre y apellido
+              </FieldLabel>
+              <Input
+                id="schedule-full-name"
+                required
+                value={form.fullName}
+                onChange={(event) =>
+                  setForm((current) => ({
+                    ...current,
+                    fullName: event.target.value,
+                  }))
+                }
+                placeholder="Tu nombre completo"
+              />
+            </Field>
+            <Field>
+              <FieldLabel htmlFor="schedule-email">Correo</FieldLabel>
+              <Input
+                id="schedule-email"
+                required
+                type="email"
+                value={form.email}
+                onChange={(event) =>
+                  setForm((current) => ({ ...current, email: event.target.value }))
+                }
+                placeholder="correo@empresa.com"
+              />
+            </Field>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-[0.92fr_1.08fr]">
+            <Field>
+              <FieldLabel htmlFor="schedule-code">Código del país</FieldLabel>
+              <div className="grid grid-cols-[3.25rem_1fr] gap-2">
+                <span className="grid h-10 place-items-center rounded-md border border-input bg-white">
+                  <FlagSwatch iso={selectedPhoneCountry.iso} />
+                </span>
+                <select
+                  id="schedule-code"
+                  className={selectClassName}
+                  value={form.countryCode}
+                  onChange={(event) =>
+                    setForm((current) => ({
+                      ...current,
+                      countryCode: event.target.value,
+                    }))
+                  }
+                >
+                  {phoneCountries.map((country) => (
+                    <option key={country.id} value={country.id}>
+                      {country.flag} {country.code} {country.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </Field>
+            <Field>
+              <FieldLabel htmlFor="schedule-phone">Celular</FieldLabel>
+              <Input
+                id="schedule-phone"
+                required
+                inputMode="tel"
+                value={form.phone}
+                onChange={(event) =>
+                  setForm((current) => ({ ...current, phone: event.target.value }))
+                }
+                placeholder="123 4567"
+              />
+            </Field>
+          </div>
+
+          <Field>
+            <FieldLabel htmlFor="schedule-residence">
+              País de residencia
+            </FieldLabel>
+            <select
+              id="schedule-residence"
+              className={selectClassName}
+              value={form.residenceCountry}
+              onChange={(event) =>
+                setForm((current) => ({
+                  ...current,
+                  residenceCountry: event.target.value,
+                }))
+              }
+            >
+              {residenceCountries.map((country) => (
+                <option key={country} value={country}>
+                  {country}
+                </option>
+              ))}
+            </select>
+          </Field>
+
+          <Field>
+            <FieldLabel htmlFor="schedule-message">Mensaje</FieldLabel>
+            <Textarea
+              id="schedule-message"
+              rows={4}
+              value={form.message}
+              onChange={(event) =>
+                setForm((current) => ({ ...current, message: event.target.value }))
+              }
+              placeholder="Cuéntanos qué necesitas resolver."
+            />
+          </Field>
+
+          {sentChannel ? (
+            <div className="rounded-md border border-primary/25 bg-primary/10 px-4 py-3 text-sm font-medium text-foreground">
+              Gracias. Tu solicitud quedó lista para enviarse por{" "}
+              {sentChannel === "whatsapp" ? "WhatsApp" : "correo electrónico"}.
+              Te contactaremos pronto.
+            </div>
+          ) : null}
+
+          <div className="grid gap-3 sm:grid-cols-2">
+            <Button
+              type="submit"
+              name="channel"
+              value="whatsapp"
+              className="h-11 rounded-md bg-primary text-primary-foreground hover:bg-[var(--brand-strong)]"
+            >
+              <MessageCircle data-icon="inline-start" />
+              Enviar por WhatsApp
+            </Button>
+            <Button
+              type="submit"
+              name="channel"
+              value="email"
+              variant="outline"
+              className="h-11 rounded-md border-primary/40 text-foreground hover:border-primary hover:bg-accent"
+            >
+              <Mail data-icon="inline-start" />
+              Enviar por correo
+            </Button>
+          </div>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 }
 
@@ -488,6 +822,7 @@ function LeadForm() {
 
 export function LandingPage() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [scheduleOpen, setScheduleOpen] = useState(false);
 
   return (
     <main id="inicio" className="min-h-screen bg-background text-foreground">
@@ -506,9 +841,13 @@ export function LandingPage() {
             ))}
           </nav>
           <div className="hidden lg:block">
-            <CtaLink className="min-w-0" variant="primary">
+            <ScheduleButton
+              className="min-w-0"
+              variant="primary"
+              onClick={() => setScheduleOpen(true)}
+            >
               Agendar consulta
-            </CtaLink>
+            </ScheduleButton>
           </div>
           <button
             type="button"
@@ -532,24 +871,31 @@ export function LandingPage() {
                   {item.label}
                 </a>
               ))}
-              <CtaLink className="mt-2 w-full" variant="primary">
+              <ScheduleButton
+                className="mt-2 w-full"
+                variant="primary"
+                onClick={() => {
+                  setMenuOpen(false);
+                  setScheduleOpen(true);
+                }}
+              >
                 Agendar consulta
-              </CtaLink>
+              </ScheduleButton>
             </nav>
           </div>
         ) : null}
       </header>
 
       <section className="relative overflow-hidden bg-white">
-        <div className="mx-auto grid min-h-[680px] max-w-7xl items-center gap-10 px-5 py-16 lg:grid-cols-[0.92fr_1.08fr] lg:px-8 lg:py-20">
+        <div className="grid min-h-[680px] w-full items-center gap-10 px-5 py-16 lg:grid-cols-[minmax(2rem,1fr)_minmax(400px,560px)_minmax(0,760px)] lg:gap-0 lg:px-0 lg:py-20">
           <motion.div
             initial={{ opacity: 0, y: 22 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, ease: "easeOut" }}
-            className="relative z-10 flex flex-col gap-8"
+            className="relative z-10 flex flex-col gap-8 lg:col-start-2 lg:pr-10"
           >
             <div className="max-w-xl">
-              <h1 className="text-balance text-5xl font-bold leading-[1.08] tracking-normal text-foreground md:text-6xl">
+              <h1 className="text-balance text-[2.45rem] font-extrabold leading-[1.08] tracking-normal text-foreground sm:text-5xl md:text-6xl">
                 Tu empresa en Estados Unidos,{" "}
                 <span className="text-primary">sin visa y sin complicaciones</span>
               </h1>
@@ -569,7 +915,12 @@ export function LandingPage() {
             </div>
             <div className="flex flex-col gap-3 sm:flex-row">
               <CtaLink variant="primary">Formar mi LLC</CtaLink>
-              <CtaLink variant="outline">Agendar consulta</CtaLink>
+              <ScheduleButton
+                variant="outline"
+                onClick={() => setScheduleOpen(true)}
+              >
+                Agendar consulta
+              </ScheduleButton>
             </div>
             <p className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground">
               <CheckCircle2 className="size-4 text-primary" />
@@ -580,15 +931,15 @@ export function LandingPage() {
             initial={{ opacity: 0, scale: 1.02 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.9, ease: "easeOut", delay: 0.1 }}
-            className="relative min-h-[420px] overflow-hidden rounded-none lg:min-h-[560px]"
+            className="relative min-h-[420px] overflow-hidden rounded-none lg:col-start-3 lg:min-h-[560px]"
           >
             <Image
               src="/hero-placeholder.png"
               alt="Asesor trabajando remotamente en una oficina luminosa"
               fill
               priority
-              className="object-cover object-center"
-              sizes="(min-width: 1024px) 58vw, 100vw"
+              className="object-cover object-left"
+              sizes="(min-width: 1024px) 42vw, 100vw"
             />
             <div className="pointer-events-none absolute inset-y-0 left-0 w-1/3 bg-gradient-to-r from-white to-transparent" />
             <div className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-white to-transparent" />
@@ -833,7 +1184,12 @@ export function LandingPage() {
               </p>
             </div>
           </div>
-          <CtaLink variant="light">Agendar consulta gratuita</CtaLink>
+          <ScheduleButton
+            variant="light"
+            onClick={() => setScheduleOpen(true)}
+          >
+            Agendar consulta gratuita
+          </ScheduleButton>
         </div>
       </section>
 
@@ -900,6 +1256,8 @@ export function LandingPage() {
           © 2024 Craghill Advisory. Todos los derechos reservados.
         </p>
       </footer>
+
+      <ScheduleDialog open={scheduleOpen} onOpenChange={setScheduleOpen} />
     </main>
   );
 }
