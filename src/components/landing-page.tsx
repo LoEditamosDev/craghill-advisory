@@ -63,13 +63,8 @@ import { cn } from "@/lib/utils";
 const navItems = [
   { label: "Inicio", href: "#inicio" },
   { label: "Servicios", href: "#servicios" },
-  { label: "Proceso", href: "#proceso" },
-  { label: "Precios", href: "#planes" },
-  { label: "Clientes", href: "#clientes" },
-  { label: "Launch", href: "#launch" },
-  { label: "Compliance", href: "#compliance" },
+  { label: "Planes", href: "#planes" },
   { label: "Contacto", href: "#lead-form" },
-  { label: "Recursos", href: "#faqs" },
 ];
 
 const heroBadges = [
@@ -110,6 +105,64 @@ const residenceCountries = [
   "República Dominicana",
   "España",
   "Otro",
+];
+
+const serviceItems = [
+  {
+    title: "Constitución de LLC",
+    body: "Creamos tu LLC en Estados Unidos de forma 100% remota, sin visa, SSN o ITIN, preparando y presentando la documentación inicial.",
+    icon: Building2,
+  },
+  {
+    title: "Obtención de EIN / Tax ID",
+    body: "Solicitamos tu EIN ante el IRS para operar, facturar, abrir cuentas comerciales y acceder a plataformas financieras.",
+    icon: BadgeCheck,
+  },
+  {
+    title: "BOI Report ante FinCEN",
+    body: "Presentamos el reporte de Beneficial Ownership Information para cumplir con obligaciones federales.",
+    icon: FileCheck2,
+  },
+  {
+    title: "Registered Agent",
+    body: "Incluimos representación legal en Estados Unidos para recibir notificaciones oficiales de tu LLC.",
+    icon: ShieldCheck,
+  },
+  {
+    title: "Operating Agreement",
+    body: "Preparamos el acuerdo operativo que define la estructura, funcionamiento y administración interna de tu empresa.",
+    icon: FileText,
+  },
+  {
+    title: "Cuenta bancaria empresarial",
+    body: "Te orientamos en la apertura de cuenta en Estados Unidos, incluyendo opciones como Mercury.",
+    icon: Landmark,
+  },
+  {
+    title: "Cumplimiento anual",
+    body: "Damos seguimiento a obligaciones, fechas clave, renovaciones y requerimientos para mantener tu LLC en regla.",
+    icon: CalendarCheck,
+  },
+  {
+    title: "Formularios 5472 y 1120",
+    body: "Preparamos formularios fiscales cuando aplican para evitar errores, multas y sanciones ante el IRS.",
+    icon: FileText,
+  },
+  {
+    title: "Soporte continuo en español",
+    body: "Te acompañamos con atención clara, directa y sin tecnicismos innecesarios durante todo el proceso.",
+    icon: Headphones,
+  },
+  {
+    title: "Correspondencia oficial",
+    body: "Revisamos comunicaciones importantes y te explicamos qué significan y qué acciones debes tomar.",
+    icon: Mail,
+  },
+  {
+    title: "Pasarelas de pago",
+    body: "Te orientamos sobre Stripe y otras soluciones para cobrar internacionalmente y operar en dólares.",
+    icon: CircleDollarSign,
+  },
 ];
 
 const audienceColumns = [
@@ -371,6 +424,7 @@ const faqs = [
 type FormState = {
   fullName: string;
   email: string;
+  countryCode: string;
   phone: string;
   companyStage: string;
   serviceInterest: string;
@@ -380,6 +434,7 @@ type FormState = {
 const initialFormState: FormState = {
   fullName: "",
   email: "",
+  countryCode: "pa",
   phone: "",
   companyStage: "",
   serviceInterest: "",
@@ -747,6 +802,11 @@ function LeadForm() {
     "idle"
   );
   const [message, setMessage] = useState("");
+  const selectedPhoneCountry =
+    phoneCountries.find((country) => country.id === form.countryCode) ??
+    phoneCountries[0];
+  const selectClassName =
+    "h-10 w-full rounded-md border border-input bg-background px-3 text-sm text-foreground outline-none transition focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50";
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -756,7 +816,12 @@ function LeadForm() {
     const response = await fetch("/api/leads", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
+      body: JSON.stringify({
+        ...form,
+        phone: form.phone
+          ? `${selectedPhoneCountry.code} ${form.phone}`.trim()
+          : "",
+      }),
     });
 
     const result = (await response.json()) as { message?: string; error?: string };
@@ -805,18 +870,46 @@ function LeadForm() {
             />
           </Field>
         </div>
-        <div className="grid gap-5 md:grid-cols-2">
+        <div className="grid gap-5 md:grid-cols-[0.9fr_1.1fr]">
+          <Field>
+            <FieldLabel htmlFor="lead-country-code">Código del país</FieldLabel>
+            <div className="grid grid-cols-[3.25rem_1fr] gap-2">
+              <span className="grid h-10 place-items-center rounded-md border border-input bg-white">
+                <FlagSwatch iso={selectedPhoneCountry.iso} />
+              </span>
+              <select
+                id="lead-country-code"
+                className={selectClassName}
+                value={form.countryCode}
+                onChange={(event) =>
+                  setForm((current) => ({
+                    ...current,
+                    countryCode: event.target.value,
+                  }))
+                }
+              >
+                {phoneCountries.map((country) => (
+                  <option key={country.id} value={country.id}>
+                    {country.code} {country.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </Field>
           <Field>
             <FieldLabel htmlFor="phone">WhatsApp o teléfono</FieldLabel>
             <Input
               id="phone"
+              inputMode="tel"
               value={form.phone}
               onChange={(event) =>
                 setForm((current) => ({ ...current, phone: event.target.value }))
               }
-              placeholder="+507 123-4567"
+              placeholder="123 4567"
             />
           </Field>
+        </div>
+        <div className="grid gap-5 md:grid-cols-2">
           <Field>
             <FieldLabel htmlFor="serviceInterest">Servicio de interés</FieldLabel>
             <Input
@@ -1014,6 +1107,44 @@ export function LandingPage() {
       </section>
 
       <SectionReveal id="servicios" className="scroll-mt-24 bg-secondary py-16">
+        <div className="mx-auto max-w-7xl px-5 lg:px-8">
+          <div className="mx-auto max-w-3xl text-center">
+            <h2 className="text-3xl font-bold leading-tight text-foreground md:text-4xl">
+              Servicios para crear y mantener tu{" "}
+              <span className="text-primary">LLC en regla</span>
+            </h2>
+            <p className="mt-4 text-sm font-medium leading-7 text-muted-foreground">
+              Centralizamos la formación, documentación, cumplimiento y operación inicial
+              de tu empresa en Estados Unidos.
+            </p>
+          </div>
+          <div className="mt-10 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {serviceItems.map((service) => {
+              const Icon = service.icon;
+              return (
+                <div
+                  key={service.title}
+                  className="flex gap-4 rounded-lg border border-primary/20 bg-white p-5 shadow-sm"
+                >
+                  <span className="grid size-11 shrink-0 place-items-center rounded-full bg-accent text-primary">
+                    <Icon className="size-5" />
+                  </span>
+                  <div>
+                    <h3 className="text-sm font-bold text-foreground">
+                      {service.title}
+                    </h3>
+                    <p className="mt-2 text-xs font-medium leading-6 text-muted-foreground">
+                      {service.body}
+                    </p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </SectionReveal>
+
+      <SectionReveal className="bg-secondary pb-16">
         <div className="mx-auto grid max-w-7xl gap-10 px-5 lg:grid-cols-3 lg:px-8">
           {audienceColumns.map((column) => (
             <div key={column.title} className="flex flex-col gap-5">
