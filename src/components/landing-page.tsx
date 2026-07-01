@@ -273,6 +273,23 @@ const planBenefits = [
   },
 ];
 
+const priceComparisons = [
+  {
+    title: "Constitución de LLC",
+    marketPrice: "Otros servicios: desde $800",
+    ourPrice: "Craghill: $499 pago único",
+    body: "Incluye formación, documentos clave, EIN, BOI, Registered Agent y acompañamiento en español.",
+    icon: Building2,
+  },
+  {
+    title: "Cumplimiento mensual",
+    marketPrice: "Abogados y asesorías: hasta $2,000/mes",
+    ourPrice: "Craghill: $99/mes",
+    body: "Seguimiento de obligaciones, alertas, formularios, BOI/FinCEN y soporte continuo sin complicarte.",
+    icon: ShieldCheck,
+  },
+];
+
 const launchIncludes = [
   {
     title: "Constitución de tu LLC",
@@ -1258,6 +1275,59 @@ export function LandingPage() {
                 </CardFooter>
               </Card>
             ))}
+          </div>
+          <div className="mt-8 rounded-lg border border-primary/25 bg-secondary p-5 shadow-sm">
+            <div className="mx-auto max-w-3xl text-center">
+              <h3 className="text-2xl font-bold text-foreground">
+                Precios pensados para emprendedores,{" "}
+                <span className="text-primary">no para inflar costos</span>
+              </h3>
+              <p className="mt-3 text-sm font-medium leading-7 text-muted-foreground">
+                Una alternativa clara frente a servicios tradicionales que suelen
+                cobrar mucho más por procesos similares.
+              </p>
+            </div>
+            <div className="mt-6 grid gap-4 lg:grid-cols-2">
+              {priceComparisons.map((comparison) => {
+                const Icon = comparison.icon;
+                return (
+                  <div
+                    key={comparison.title}
+                    className="rounded-lg border border-primary/25 bg-white p-5"
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className="grid size-11 shrink-0 place-items-center rounded-full bg-accent text-primary">
+                        <Icon className="size-5" />
+                      </span>
+                      <h4 className="font-bold text-foreground">
+                        {comparison.title}
+                      </h4>
+                    </div>
+                    <div className="mt-5 grid gap-3 sm:grid-cols-2">
+                      <div className="rounded-md border border-border bg-muted p-4">
+                        <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
+                          Mercado tradicional
+                        </p>
+                        <p className="mt-2 text-lg font-bold text-foreground/75">
+                          {comparison.marketPrice}
+                        </p>
+                      </div>
+                      <div className="rounded-md border border-primary/35 bg-primary/10 p-4">
+                        <p className="text-xs font-bold uppercase tracking-wide text-primary">
+                          Nuestra propuesta
+                        </p>
+                        <p className="mt-2 text-lg font-bold text-foreground">
+                          {comparison.ourPrice}
+                        </p>
+                      </div>
+                    </div>
+                    <p className="mt-4 text-sm font-medium leading-7 text-muted-foreground">
+                      {comparison.body}
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
           </div>
           <div className="mt-8 grid gap-4 md:grid-cols-3">
             {planBenefits.map((benefit) => {
