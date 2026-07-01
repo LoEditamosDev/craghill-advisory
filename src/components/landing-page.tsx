@@ -618,13 +618,17 @@ function ScheduleButton({
 
 function FlagSwatch({ iso }: { iso: string }) {
   return (
-    <span
-      className="block h-[18px] w-6 rounded-[2px] border border-foreground/10 bg-cover bg-center shadow-sm"
-      style={{
-        backgroundImage: `url(/flags/${iso}.svg)`,
-      }}
-      aria-hidden="true"
-    />
+    <span className="relative block aspect-[3/2] w-8 overflow-hidden rounded-[2px] border border-foreground/10 bg-white shadow-sm">
+      <Image
+        src={`/flags/${iso}.svg`}
+        alt=""
+        fill
+        sizes="32px"
+        className="object-contain"
+        unoptimized
+        aria-hidden="true"
+      />
+    </span>
   );
 }
 
