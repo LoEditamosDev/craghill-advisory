@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { FormEvent, ReactNode, useState } from "react";
+import { allCountries } from "country-telephone-data";
 import { motion, useReducedMotion } from "framer-motion";
 import {
   ArrowRight,
@@ -74,24 +75,51 @@ const heroBadges = [
   "Cumplimiento continuo",
 ];
 
-const phoneCountries = [
-  { id: "pa", label: "Panamá", code: "+507", flag: "🇵🇦", iso: "pa" },
-  { id: "us", label: "Estados Unidos", code: "+1", flag: "🇺🇸", iso: "us" },
-  { id: "co", label: "Colombia", code: "+57", flag: "🇨🇴", iso: "co" },
-  { id: "mx", label: "México", code: "+52", flag: "🇲🇽", iso: "mx" },
-  { id: "cl", label: "Chile", code: "+56", flag: "🇨🇱", iso: "cl" },
-  { id: "pe", label: "Perú", code: "+51", flag: "🇵🇪", iso: "pe" },
-  { id: "ar", label: "Argentina", code: "+54", flag: "🇦🇷", iso: "ar" },
-  { id: "ec", label: "Ecuador", code: "+593", flag: "🇪🇨", iso: "ec" },
-  {
-    id: "do",
-    label: "República Dominicana",
-    code: "+1",
-    flag: "🇩🇴",
-    iso: "do",
-  },
-  { id: "es", label: "España", code: "+34", flag: "🇪🇸", iso: "es" },
+const preferredPhoneCountryIds = [
+  "pa",
+  "us",
+  "co",
+  "mx",
+  "cl",
+  "pe",
+  "ar",
+  "ec",
+  "do",
+  "es",
 ];
+
+const countryNameOverrides: Record<string, string> = {
+  ar: "Argentina",
+  cl: "Chile",
+  co: "Colombia",
+  do: "República Dominicana",
+  ec: "Ecuador",
+  es: "España",
+  mx: "México",
+  pa: "Panamá",
+  pe: "Perú",
+  us: "Estados Unidos",
+};
+
+const phoneCountries = allCountries
+  .map((country) => ({
+    id: country.iso2,
+    label:
+      countryNameOverrides[country.iso2] ??
+      country.name.replace(/\s*\(.+?\)\s*/g, "").trim(),
+    code: `+${country.dialCode}`,
+    iso: country.iso2,
+  }))
+  .sort((a, b) => {
+    const aIndex = preferredPhoneCountryIds.indexOf(a.id);
+    const bIndex = preferredPhoneCountryIds.indexOf(b.id);
+
+    if (aIndex !== -1 || bIndex !== -1) {
+      return (aIndex === -1 ? 999 : aIndex) - (bIndex === -1 ? 999 : bIndex);
+    }
+
+    return a.label.localeCompare(b.label, "es");
+  });
 
 const residenceCountries = [
   "Panamá",
@@ -615,7 +643,7 @@ function ScheduleDialog({
     phoneCountries.find((country) => country.id === form.countryCode) ??
     phoneCountries[0];
   const selectClassName =
-    "h-10 w-full rounded-md border border-input bg-background px-3 text-sm text-foreground outline-none transition focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50";
+    "h-11 w-full min-w-0 rounded-md border border-input bg-background px-3 text-sm font-medium text-foreground outline-none transition focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50";
 
   function buildScheduleMessage() {
     return [
@@ -704,8 +732,8 @@ function ScheduleDialog({
           <div className="grid gap-4 sm:grid-cols-[0.92fr_1.08fr]">
             <Field>
               <FieldLabel htmlFor="schedule-code">Código del país</FieldLabel>
-              <div className="grid grid-cols-[3.25rem_1fr] gap-2">
-                <span className="grid h-10 place-items-center rounded-md border border-input bg-white">
+              <div className="grid grid-cols-[3.5rem_minmax(0,1fr)] gap-2">
+                <span className="grid h-11 place-items-center rounded-md border border-input bg-white">
                   <FlagSwatch iso={selectedPhoneCountry.iso} />
                 </span>
                 <select
@@ -823,7 +851,7 @@ function LeadForm() {
     phoneCountries.find((country) => country.id === form.countryCode) ??
     phoneCountries[0];
   const selectClassName =
-    "h-10 w-full rounded-md border border-input bg-background px-3 text-sm text-foreground outline-none transition focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50";
+    "h-11 w-full min-w-0 rounded-md border border-input bg-background px-3 text-sm font-medium text-foreground outline-none transition focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50";
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -890,8 +918,8 @@ function LeadForm() {
         <div className="grid gap-5 md:grid-cols-[0.9fr_1.1fr]">
           <Field>
             <FieldLabel htmlFor="lead-country-code">Código del país</FieldLabel>
-            <div className="grid grid-cols-[3.25rem_1fr] gap-2">
-              <span className="grid h-10 place-items-center rounded-md border border-input bg-white">
+            <div className="grid grid-cols-[3.5rem_minmax(0,1fr)] gap-2">
+              <span className="grid h-11 place-items-center rounded-md border border-input bg-white">
                 <FlagSwatch iso={selectedPhoneCountry.iso} />
               </span>
               <select
