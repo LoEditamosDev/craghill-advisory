@@ -504,6 +504,12 @@ const initialScheduleForm: ScheduleFormState = {
   message: "",
 };
 
+const wideContainerClass =
+  "mx-auto w-full max-w-[1500px] px-5 sm:px-6 lg:px-10 2xl:px-12";
+
+const mediumContainerClass =
+  "mx-auto w-full max-w-[1180px] px-5 sm:px-6 lg:px-10 2xl:px-12";
+
 function SectionReveal({
   children,
   className,
@@ -1035,7 +1041,7 @@ export function LandingPage() {
   return (
     <main id="inicio" className="min-h-screen bg-background text-foreground">
       <header className="sticky top-0 z-50 border-b border-border/70 bg-white/92 backdrop-blur">
-        <div className="mx-auto flex h-20 w-full max-w-[1500px] items-center justify-between gap-5 px-5 lg:px-8">
+        <div className={cn(wideContainerClass, "flex h-20 items-center justify-between gap-5")}>
           <LogoMark />
           <nav className="hidden items-center gap-5 xl:gap-7 lg:flex">
             {navItems.map((item) => (
@@ -1067,8 +1073,8 @@ export function LandingPage() {
           </button>
         </div>
         {menuOpen ? (
-          <div className="border-t border-border bg-white px-5 py-4 lg:hidden">
-            <nav className="mx-auto flex max-w-7xl flex-col gap-3">
+          <div className="border-t border-border bg-white py-4 lg:hidden">
+            <nav className={cn(wideContainerClass, "flex flex-col gap-3")}>
               {navItems.map((item) => (
                 <a
                   key={item.href}
@@ -1095,19 +1101,19 @@ export function LandingPage() {
       </header>
 
       <section className="relative overflow-hidden bg-white">
-        <div className="grid min-h-[700px] w-full items-center gap-10 px-5 py-16 lg:grid-cols-[minmax(2rem,calc((100vw-1280px)/2+2rem))_minmax(420px,560px)_minmax(0,1fr)] lg:gap-0 lg:px-0 lg:py-20">
+        <div className="grid min-h-[700px] w-full items-center gap-10 px-5 py-16 sm:px-6 lg:min-h-[740px] lg:grid-cols-[minmax(2.5rem,calc((100vw-1500px)/2+2.5rem))_minmax(440px,650px)_minmax(0,1fr)] lg:gap-0 lg:px-0 lg:py-20">
           <motion.div
             initial={{ opacity: 0, y: 22 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, ease: "easeOut" }}
-            className="relative z-10 flex flex-col gap-8 lg:col-start-2 lg:pr-10"
+            className="relative z-10 flex flex-col gap-8 lg:col-start-2 lg:pr-12"
           >
-            <div className="max-w-xl">
+            <div className="max-w-2xl">
               <h1 className="text-balance text-[2.45rem] font-extrabold leading-[1.08] tracking-normal text-foreground sm:text-5xl md:text-6xl">
                 Tu empresa en Estados Unidos,{" "}
                 <span className="text-primary">sin visa y sin complicaciones</span>
               </h1>
-              <p className="mt-6 max-w-lg text-base leading-7 text-muted-foreground">
+              <p className="mt-6 max-w-xl text-base leading-7 text-muted-foreground">
                 Constituimos tu LLC en Estados Unidos y te acompañamos en cada etapa
                 para que puedas operar legalmente, cobrar internacionalmente y hacer
                 crecer tu negocio.
@@ -1156,7 +1162,7 @@ export function LandingPage() {
       </section>
 
       <SectionReveal id="servicios" className="scroll-mt-24 bg-secondary py-16">
-        <div className="mx-auto max-w-7xl px-5 lg:px-8">
+        <div className={wideContainerClass}>
           <div className="mx-auto max-w-3xl text-center">
             <h2 className="text-3xl font-bold leading-tight text-foreground md:text-4xl">
               Servicios para crear y mantener tu{" "}
@@ -1194,7 +1200,7 @@ export function LandingPage() {
       </SectionReveal>
 
       <SectionReveal className="bg-secondary pb-16">
-        <div className="mx-auto grid max-w-7xl gap-10 px-5 lg:grid-cols-3 lg:px-8">
+        <div className={cn(wideContainerClass, "grid gap-10 lg:grid-cols-3")}>
           {audienceColumns.map((column) => (
             <div key={column.title} className="flex flex-col gap-5">
               <h2 className="text-3xl font-bold leading-tight text-foreground">
@@ -1227,7 +1233,7 @@ export function LandingPage() {
       </SectionReveal>
 
       <SectionReveal id="proceso" className="scroll-mt-24 bg-white py-16">
-        <div className="mx-auto max-w-7xl px-5 lg:px-8">
+        <div className={wideContainerClass}>
           <h2 className="text-center text-3xl font-bold text-foreground">
             Un proceso claro, simple y <span className="text-primary">100% remoto</span>
           </h2>
@@ -1257,7 +1263,7 @@ export function LandingPage() {
       </SectionReveal>
 
       <SectionReveal id="planes" className="scroll-mt-24 bg-white pb-16">
-        <div className="mx-auto max-w-7xl px-5 lg:px-8">
+        <div className={wideContainerClass}>
           <h2 className="text-center text-3xl font-bold text-foreground">
             Planes simples y transparentes
           </h2>
@@ -1386,7 +1392,7 @@ export function LandingPage() {
       </SectionReveal>
 
       <SectionReveal id="clientes" className="scroll-mt-24 bg-white pb-16">
-        <div className="mx-auto max-w-7xl px-5 lg:px-8">
+        <div className={wideContainerClass}>
           <h2 className="text-center text-3xl font-bold text-foreground">
             Lo que dicen nuestros clientes
           </h2>
@@ -1430,7 +1436,7 @@ export function LandingPage() {
       </SectionReveal>
 
       <SectionReveal id="launch" className="scroll-mt-24 bg-white py-16">
-        <div className="mx-auto max-w-5xl px-5 lg:px-8">
+        <div className={mediumContainerClass}>
           <div className="flex justify-center">
             <Image
               src="/badge-llc.png"
@@ -1470,7 +1476,7 @@ export function LandingPage() {
       </SectionReveal>
 
       <SectionReveal id="compliance" className="scroll-mt-24 bg-white py-16">
-        <div className="mx-auto max-w-5xl px-5 lg:px-8">
+        <div className={mediumContainerClass}>
           <div className="flex justify-center">
             <Image
               src="/badge-compliance.png"
@@ -1527,7 +1533,7 @@ export function LandingPage() {
       </SectionReveal>
 
       <SectionReveal id="lead-form" className="scroll-mt-24 bg-secondary py-16">
-        <div className="mx-auto grid max-w-7xl gap-10 px-5 lg:grid-cols-[0.8fr_1.2fr] lg:px-8">
+        <div className={cn(wideContainerClass, "grid gap-10 lg:grid-cols-[0.8fr_1.2fr]")}>
           <div className="flex flex-col justify-center gap-5">
             <span className="inline-flex size-14 items-center justify-center rounded-full bg-primary text-primary-foreground">
               <MessageCircle className="size-7" />
@@ -1546,7 +1552,7 @@ export function LandingPage() {
       </SectionReveal>
 
       <SectionReveal id="faqs" className="scroll-mt-24 bg-white py-16">
-        <div className="mx-auto max-w-7xl px-5 lg:px-8">
+        <div className={wideContainerClass}>
           <h2 className="text-center text-3xl font-bold text-foreground">
             Preguntas frecuentes
           </h2>
@@ -1568,7 +1574,7 @@ export function LandingPage() {
       </SectionReveal>
 
       <section className="bg-primary py-7">
-        <div className="mx-auto flex max-w-7xl flex-col gap-5 px-5 md:flex-row md:items-center md:justify-between lg:px-8">
+        <div className={cn(wideContainerClass, "flex flex-col gap-5 md:flex-row md:items-center md:justify-between")}>
           <div className="flex items-center gap-4 text-primary-foreground">
             <span className="grid size-14 place-items-center rounded-full border border-white/40 bg-white/15">
               <CalendarCheck className="size-7" />
@@ -1590,7 +1596,7 @@ export function LandingPage() {
       </section>
 
       <footer id="contacto" className="bg-[var(--footer)] py-12 text-white">
-        <div className="mx-auto grid max-w-7xl gap-10 px-5 md:grid-cols-[1.2fr_0.9fr_0.9fr] lg:px-8">
+        <div className={cn(wideContainerClass, "grid gap-10 md:grid-cols-[1.2fr_0.9fr_0.9fr]")}>
           <div className="flex flex-col gap-5">
             <LogoMark dark />
             <p className="max-w-sm text-sm leading-7 text-white/70">
@@ -1647,8 +1653,8 @@ export function LandingPage() {
             </ul>
           </div>
         </div>
-        <Separator className="mx-auto mt-10 max-w-7xl bg-white/10" />
-        <p className="mx-auto mt-6 max-w-7xl px-5 text-center text-sm text-white/60 lg:px-8">
+        <Separator className="mx-auto mt-10 max-w-[1500px] bg-white/10" />
+        <p className={cn(wideContainerClass, "mt-6 text-center text-sm text-white/60")}>
           © 2024 Craghill Advisory. Todos los derechos reservados.
         </p>
       </footer>
