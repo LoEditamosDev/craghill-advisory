@@ -311,7 +311,7 @@ const priceComparisons = [
   },
   {
     title: "Cumplimiento mensual",
-    marketPrice: "Abogados y asesorías: hasta $2,000/mes",
+    marketPrice: "Otros proveedores: hasta $2,500/año",
     ourPrice: "Craghill: $99/mes",
     body: "Seguimiento de obligaciones, alertas, formularios, BOI/FinCEN y soporte continuo sin complicarte.",
     icon: ShieldCheck,
@@ -1441,9 +1441,9 @@ export function LandingPage() {
             <Image
               src="/badge-llc.png"
               alt="Craghill Advisory LLC Formation Certified"
-              width={220}
-              height={220}
-              className="h-44 w-auto object-contain"
+              width={280}
+              height={280}
+              className="h-52 w-auto object-contain md:h-56"
             />
           </div>
           <div className="mt-8 text-center">
@@ -1481,9 +1481,9 @@ export function LandingPage() {
             <Image
               src="/badge-compliance.png"
               alt="Craghill Advisory Compliance Verified"
-              width={240}
-              height={240}
-              className="h-52 w-auto object-contain"
+              width={300}
+              height={300}
+              className="h-60 w-auto object-contain md:h-64"
             />
           </div>
           <div className="mt-8 rounded-lg border border-primary/25 bg-white p-8 text-center shadow-sm">
