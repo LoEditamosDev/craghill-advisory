@@ -530,6 +530,7 @@ const mediumContainerClass =
 const contactEmail = "soporte@craghilladvisory.com";
 const contactPhoneDisplay = "+1 505 207 2705";
 const contactWhatsAppNumber = "15052072705";
+const contactPhoneHref = "tel:+15052072705";
 const contactLocation = "Albuquerque, New Mexico, USA";
 
 function SectionReveal({
@@ -1757,10 +1758,8 @@ export function LandingPage() {
               <li className="flex items-center gap-3">
                 <Phone className="size-4 text-primary" />
                 <a
-                  href={`https://wa.me/${contactWhatsAppNumber}`}
+                  href={contactPhoneHref}
                   className="transition hover:text-primary"
-                  target="_blank"
-                  rel="noreferrer"
                 >
                   {contactPhoneDisplay}
                 </a>
