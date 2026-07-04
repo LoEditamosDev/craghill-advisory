@@ -121,17 +121,30 @@ const phoneCountries = allCountries
     return a.label.localeCompare(b.label, "es");
   });
 
-const residenceCountries = [
-  "Panamá",
-  "Estados Unidos",
-  "Colombia",
-  "México",
-  "Chile",
-  "Perú",
-  "Argentina",
-  "Ecuador",
-  "República Dominicana",
-  "España",
+const residenceCountries = [...phoneCountries.map((country) => country.label), "Otro"];
+
+const consultationTypeOptions = [
+  "Formar una LLC",
+  "EIN / Tax ID",
+  "Compliance mensual",
+  "BOI Report",
+  "Cuenta bancaria empresarial",
+  "Pasarelas de pago",
+  "Registered Agent",
+  "Formularios 5472 y 1120",
+  "Revisión de correspondencia oficial",
+  "Quiero orientación general",
+  "Otro",
+];
+
+const businessStageOptions = [
+  "Idea inicial",
+  "Estoy evaluando abrir una LLC",
+  "Ya vendo online",
+  "Tengo una empresa activa fuera de EE. UU.",
+  "Ya tengo LLC en Estados Unidos",
+  "Necesito poner mi LLC en regla",
+  "Quiero cobrar internacionalmente",
   "Otro",
 ];
 
@@ -481,8 +494,8 @@ const initialFormState: FormState = {
   email: "",
   countryCode: "pa",
   phone: "",
-  companyStage: "",
-  serviceInterest: "",
+  companyStage: businessStageOptions[0],
+  serviceInterest: consultationTypeOptions[0],
   message: "",
 };
 
@@ -492,6 +505,8 @@ type ScheduleFormState = {
   countryCode: string;
   phone: string;
   residenceCountry: string;
+  companyStage: string;
+  serviceInterest: string;
   message: string;
 };
 
@@ -501,6 +516,8 @@ const initialScheduleForm: ScheduleFormState = {
   countryCode: "pa",
   phone: "",
   residenceCountry: "Panamá",
+  companyStage: businessStageOptions[0],
+  serviceInterest: consultationTypeOptions[0],
   message: "",
 };
 
@@ -672,6 +689,8 @@ function ScheduleDialog({
       `Correo: ${form.email}`,
       `Celular: ${selectedPhoneCountry.code} ${form.phone}`,
       `País de residencia: ${form.residenceCountry}`,
+      `Tipo de consulta: ${form.serviceInterest}`,
+      `Etapa del negocio: ${form.companyStage}`,
       `Mensaje: ${form.message || "Sin mensaje adicional"}`,
     ].join("\n");
   }
@@ -703,8 +722,8 @@ function ScheduleDialog({
           fullName: form.fullName,
           email: form.email,
           phone: `${selectedPhoneCountry.code} ${form.phone}`.trim(),
-          companyStage: "Consulta desde popup",
-          serviceInterest: "Agendar consulta",
+          companyStage: form.companyStage,
+          serviceInterest: form.serviceInterest,
           message: `País de residencia: ${form.residenceCountry}\n\n${form.message || "Sin mensaje adicional"}`,
           source: "schedule-popup",
         }),
@@ -840,6 +859,53 @@ function ScheduleDialog({
               ))}
             </select>
           </Field>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Field>
+              <FieldLabel htmlFor="schedule-service-interest">
+                Tipo de consulta
+              </FieldLabel>
+              <select
+                id="schedule-service-interest"
+                className={selectClassName}
+                value={form.serviceInterest}
+                onChange={(event) =>
+                  setForm((current) => ({
+                    ...current,
+                    serviceInterest: event.target.value,
+                  }))
+                }
+              >
+                {consultationTypeOptions.map((option) => (
+                  <option key={option} value={option}>
+                    {option}
+                  </option>
+                ))}
+              </select>
+            </Field>
+            <Field>
+              <FieldLabel htmlFor="schedule-company-stage">
+                Etapa del negocio
+              </FieldLabel>
+              <select
+                id="schedule-company-stage"
+                className={selectClassName}
+                value={form.companyStage}
+                onChange={(event) =>
+                  setForm((current) => ({
+                    ...current,
+                    companyStage: event.target.value,
+                  }))
+                }
+              >
+                {businessStageOptions.map((option) => (
+                  <option key={option} value={option}>
+                    {option}
+                  </option>
+                ))}
+              </select>
+            </Field>
+          </div>
 
           <Field>
             <FieldLabel htmlFor="schedule-message">Mensaje</FieldLabel>
@@ -1019,8 +1085,9 @@ function LeadForm() {
         <div className="grid gap-5 md:grid-cols-2">
           <Field>
             <FieldLabel htmlFor="serviceInterest">Servicio de interés</FieldLabel>
-            <Input
+            <select
               id="serviceInterest"
+              className={selectClassName}
               value={form.serviceInterest}
               onChange={(event) =>
                 setForm((current) => ({
@@ -1028,24 +1095,35 @@ function LeadForm() {
                   serviceInterest: event.target.value,
                 }))
               }
-              placeholder="LLC, EIN, Compliance..."
-            />
+            >
+              {consultationTypeOptions.map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
+            </select>
+          </Field>
+          <Field>
+            <FieldLabel htmlFor="companyStage">Etapa de tu negocio</FieldLabel>
+            <select
+              id="companyStage"
+              className={selectClassName}
+              value={form.companyStage}
+              onChange={(event) =>
+                setForm((current) => ({
+                  ...current,
+                  companyStage: event.target.value,
+                }))
+              }
+            >
+              {businessStageOptions.map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
+            </select>
           </Field>
         </div>
-        <Field>
-          <FieldLabel htmlFor="companyStage">Etapa de tu negocio</FieldLabel>
-          <Input
-            id="companyStage"
-            value={form.companyStage}
-            onChange={(event) =>
-              setForm((current) => ({
-                ...current,
-                companyStage: event.target.value,
-              }))
-            }
-            placeholder="Idea, ya vendo online, empresa activa..."
-          />
-        </Field>
         <Field>
           <FieldLabel htmlFor="message">Mensaje</FieldLabel>
           <Textarea
@@ -1594,9 +1672,9 @@ export function LandingPage() {
               Agenda una consulta y descubre cómo podemos ayudarte.
             </h2>
             <p className="text-base font-medium leading-7 text-muted-foreground">
-              Los botones principales de la página llegan aquí. Más adelante este
-              formulario guardará cada lead en Supabase y podrá alimentar un dashboard
-              privado.
+              Los botones principales de la página llegan aquí. Recibiremos tu
+              solicitud en el correo de soporte para orientarte con el siguiente
+              paso de tu empresa.
             </p>
           </div>
           <LeadForm />
