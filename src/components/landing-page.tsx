@@ -1569,10 +1569,10 @@ export function LandingPage() {
         <div className={mediumContainerClass}>
           <div className="flex justify-center">
             <Image
-              src="/badge-llc.png"
+              src="/badge_llc_badge.png"
               alt="Craghill Advisory LLC Formation Certified"
-              width={280}
-              height={280}
+              width={712}
+              height={821}
               className="h-52 w-auto object-contain md:h-56"
             />
           </div>
@@ -1609,10 +1609,10 @@ export function LandingPage() {
         <div className={mediumContainerClass}>
           <div className="flex justify-center">
             <Image
-              src="/badge-compliance.png"
+              src="/bad_compilance_badge.png"
               alt="Craghill Advisory Compliance Verified"
-              width={300}
-              height={300}
+              width={854}
+              height={915}
               className="h-60 w-auto object-contain md:h-64"
             />
           </div>
