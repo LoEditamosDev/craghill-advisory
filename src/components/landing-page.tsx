@@ -510,6 +510,11 @@ const wideContainerClass =
 const mediumContainerClass =
   "mx-auto w-full max-w-[1180px] px-5 sm:px-6 lg:px-10 2xl:px-12";
 
+const contactEmail = "soporte@craghilladvisory.com";
+const contactPhoneDisplay = "+1 505 207 2705";
+const contactWhatsAppNumber = "15052072705";
+const contactLocation = "Albuquerque, New Mexico, USA";
+
 function SectionReveal({
   children,
   className,
@@ -649,6 +654,10 @@ function ScheduleDialog({
   const [sentChannel, setSentChannel] = useState<"whatsapp" | "email" | null>(
     null
   );
+  const [submitStatus, setSubmitStatus] = useState<
+    "idle" | "loading" | "success" | "error"
+  >("idle");
+  const [submitMessage, setSubmitMessage] = useState("");
   const selectedPhoneCountry =
     phoneCountries.find((country) => country.id === form.countryCode) ??
     phoneCountries[0];
@@ -667,8 +676,10 @@ function ScheduleDialog({
     ].join("\n");
   }
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    setSubmitStatus("loading");
+    setSubmitMessage("");
 
     const submitter = (event.nativeEvent as SubmitEvent)
       .submitter as HTMLButtonElement | null;
@@ -678,14 +689,41 @@ function ScheduleDialog({
 
     if (channel === "whatsapp") {
       window.open(
-        `https://wa.me/5071234567?text=${encodeURIComponent(message)}`,
+        `https://wa.me/${contactWhatsAppNumber}?text=${encodeURIComponent(message)}`,
         "_blank",
         "noopener,noreferrer"
       );
+      setSubmitStatus("success");
+      setSubmitMessage("Gracias. Tu solicitud quedó lista para enviarse por WhatsApp.");
     } else {
-      window.location.href = `mailto:hola@craghilladvisory.com?subject=${encodeURIComponent(
-        "Consulta Craghill Advisory"
-      )}&body=${encodeURIComponent(message)}`;
+      const response = await fetch("/api/leads", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          fullName: form.fullName,
+          email: form.email,
+          phone: `${selectedPhoneCountry.code} ${form.phone}`.trim(),
+          companyStage: "Consulta desde popup",
+          serviceInterest: "Agendar consulta",
+          message: `País de residencia: ${form.residenceCountry}\n\n${form.message || "Sin mensaje adicional"}`,
+          source: "schedule-popup",
+        }),
+      });
+      const result = (await response.json()) as {
+        message?: string;
+        error?: string;
+      };
+
+      if (!response.ok) {
+        setSubmitStatus("error");
+        setSubmitMessage(result.error ?? "No pudimos enviar el correo.");
+        return;
+      }
+
+      setSubmitStatus("success");
+      setSubmitMessage(
+        result.message ?? "Gracias. Recibimos tu información y te contactaremos pronto."
+      );
     }
 
     setSentChannel(channel);
@@ -816,11 +854,23 @@ function ScheduleDialog({
             />
           </Field>
 
-          {sentChannel ? (
-            <div className="rounded-md border border-primary/25 bg-primary/10 px-4 py-3 text-sm font-medium text-foreground">
-              Gracias. Tu solicitud quedó lista para enviarse por{" "}
-              {sentChannel === "whatsapp" ? "WhatsApp" : "correo electrónico"}.
-              Te contactaremos pronto.
+          {submitMessage ? (
+            <div
+              className={cn(
+                "rounded-md border px-4 py-3 text-sm font-medium",
+                submitStatus === "error"
+                  ? "border-destructive/30 bg-destructive/10 text-destructive"
+                  : "border-primary/25 bg-primary/10 text-foreground"
+              )}
+            >
+              {submitMessage}
+              {sentChannel ? (
+                <>
+                  {" "}
+                  Canal seleccionado:{" "}
+                  {sentChannel === "whatsapp" ? "WhatsApp" : "correo electrónico"}.
+                </>
+              ) : null}
             </div>
           ) : null}
 
@@ -829,16 +879,18 @@ function ScheduleDialog({
               type="submit"
               name="channel"
               value="whatsapp"
+              disabled={submitStatus === "loading"}
               className="h-11 rounded-md bg-primary text-primary-foreground hover:bg-[var(--brand-strong)]"
             >
               <MessageCircle data-icon="inline-start" />
-              Enviar por WhatsApp
+              {submitStatus === "loading" ? "Enviando..." : "Enviar por WhatsApp"}
             </Button>
             <Button
               type="submit"
               name="channel"
               value="email"
               variant="outline"
+              disabled={submitStatus === "loading"}
               className="h-11 rounded-md border-primary/40 text-foreground hover:border-primary hover:bg-accent"
             >
               <Mail data-icon="inline-start" />
@@ -1006,7 +1058,7 @@ function LeadForm() {
             placeholder="Cuéntanos qué necesitas resolver."
           />
           <FieldDescription>
-            Este formulario quedará conectado a Supabase cuando agregues las variables de entorno.
+            Este formulario se enviará al correo de soporte cuando configures Resend en Vercel.
           </FieldDescription>
         </Field>
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
@@ -1620,15 +1672,24 @@ export function LandingPage() {
             <ul className="mt-4 flex flex-col gap-3 text-sm text-white/75">
               <li className="flex items-center gap-3">
                 <Mail className="size-4 text-primary" />
-                hola@craghilladvisory.com
+                <a href={`mailto:${contactEmail}`} className="transition hover:text-primary">
+                  {contactEmail}
+                </a>
               </li>
               <li className="flex items-center gap-3">
                 <Phone className="size-4 text-primary" />
-                +507 123-4567
+                <a
+                  href={`https://wa.me/${contactWhatsAppNumber}`}
+                  className="transition hover:text-primary"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  {contactPhoneDisplay}
+                </a>
               </li>
               <li className="flex items-center gap-3">
                 <MapPin className="size-4 text-primary" />
-                Panamá, Rep. de Panamá
+                {contactLocation}
               </li>
             </ul>
           </div>

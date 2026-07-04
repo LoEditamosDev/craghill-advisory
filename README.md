@@ -31,9 +31,21 @@ NEXT_PUBLIC_SITE_URL=http://localhost:3000
 NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=
+RESEND_API_KEY=
+RESEND_FROM_EMAIL=Craghill Advisory <onboarding@resend.dev>
+LEADS_TO_EMAIL=soporte@craghilladvisory.com
 ```
 
 Sin variables de Supabase, el formulario responde en modo demo. Con Supabase configurado, `/api/leads` guarda registros en la tabla `leads`.
+
+Para que los formularios se envíen directamente a correo:
+
+1. Crea una cuenta en Resend.
+2. Verifica el dominio o remitente que usarás en `RESEND_FROM_EMAIL`.
+3. Crea una API key y guárdala como `RESEND_API_KEY` en Vercel.
+4. Usa `LEADS_TO_EMAIL=soporte@craghilladvisory.com`.
+
+Si `RESEND_API_KEY` está configurada, `/api/leads` envía cada formulario al correo de soporte. Supabase sigue funcionando como respaldo para guardar leads si sus variables también están configuradas.
 
 ## Supabase
 
