@@ -529,7 +529,6 @@ const mediumContainerClass =
 
 const contactEmail = "soporte@craghilladvisory.com";
 const contactPhoneDisplay = "+1 505 207 2705";
-const contactWhatsAppNumber = "15052072705";
 const contactPhoneHref = "tel:+15052072705";
 const contactLocation = "Albuquerque, New Mexico, USA";
 
@@ -669,9 +668,6 @@ function ScheduleDialog({
   onOpenChange: (open: boolean) => void;
 }) {
   const [form, setForm] = useState<ScheduleFormState>(initialScheduleForm);
-  const [sentChannel, setSentChannel] = useState<"whatsapp" | "email" | null>(
-    null
-  );
   const [submitStatus, setSubmitStatus] = useState<
     "idle" | "loading" | "success" | "error"
   >("idle");
@@ -682,71 +678,39 @@ function ScheduleDialog({
   const selectClassName =
     "h-11 w-full min-w-0 rounded-md border border-input bg-background px-3 text-sm font-medium text-foreground outline-none transition focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50";
 
-  function buildScheduleMessage() {
-    return [
-      "Nueva consulta desde Craghill Advisory",
-      "",
-      `Nombre y apellido: ${form.fullName}`,
-      `Correo: ${form.email}`,
-      `Celular: ${selectedPhoneCountry.code} ${form.phone}`,
-      `País de residencia: ${form.residenceCountry}`,
-      `Tipo de consulta: ${form.serviceInterest}`,
-      `Etapa del negocio: ${form.companyStage}`,
-      `Mensaje: ${form.message || "Sin mensaje adicional"}`,
-    ].join("\n");
-  }
-
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setSubmitStatus("loading");
     setSubmitMessage("");
 
-    const submitter = (event.nativeEvent as SubmitEvent)
-      .submitter as HTMLButtonElement | null;
-    const channel =
-      submitter?.value === "email" ? ("email" as const) : ("whatsapp" as const);
-    const message = buildScheduleMessage();
+    const response = await fetch("/api/leads", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        fullName: form.fullName,
+        email: form.email,
+        phone: `${selectedPhoneCountry.code} ${form.phone}`.trim(),
+        companyStage: form.companyStage,
+        serviceInterest: form.serviceInterest,
+        message: `País de residencia: ${form.residenceCountry}\n\n${form.message || "Sin mensaje adicional"}`,
+        source: "schedule-popup",
+      }),
+    });
+    const result = (await response.json()) as {
+      message?: string;
+      error?: string;
+    };
 
-    if (channel === "whatsapp") {
-      window.open(
-        `https://wa.me/${contactWhatsAppNumber}?text=${encodeURIComponent(message)}`,
-        "_blank",
-        "noopener,noreferrer"
-      );
-      setSubmitStatus("success");
-      setSubmitMessage("Gracias. Tu solicitud quedó lista para enviarse por WhatsApp.");
-    } else {
-      const response = await fetch("/api/leads", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          fullName: form.fullName,
-          email: form.email,
-          phone: `${selectedPhoneCountry.code} ${form.phone}`.trim(),
-          companyStage: form.companyStage,
-          serviceInterest: form.serviceInterest,
-          message: `País de residencia: ${form.residenceCountry}\n\n${form.message || "Sin mensaje adicional"}`,
-          source: "schedule-popup",
-        }),
-      });
-      const result = (await response.json()) as {
-        message?: string;
-        error?: string;
-      };
-
-      if (!response.ok) {
-        setSubmitStatus("error");
-        setSubmitMessage(result.error ?? "No pudimos enviar el correo.");
-        return;
-      }
-
-      setSubmitStatus("success");
-      setSubmitMessage(
-        result.message ?? "Gracias. Recibimos tu información y te contactaremos pronto."
-      );
+    if (!response.ok) {
+      setSubmitStatus("error");
+      setSubmitMessage(result.error ?? "No pudimos enviar el correo.");
+      return;
     }
 
-    setSentChannel(channel);
+    setSubmitStatus("success");
+    setSubmitMessage(
+      result.message ?? "Gracias. Recibimos tu información y te contactaremos pronto."
+    );
     setForm(initialScheduleForm);
   }
 
@@ -758,8 +722,7 @@ function ScheduleDialog({
             Agenda tu consulta
           </DialogTitle>
           <DialogDescription className="leading-6">
-            Déjanos tus datos y elige si prefieres enviarlos por WhatsApp o por
-            correo electrónico.
+            Déjanos tus datos y te contactaremos por correo electrónico.
           </DialogDescription>
         </DialogHeader>
 
@@ -931,37 +894,17 @@ function ScheduleDialog({
               )}
             >
               {submitMessage}
-              {sentChannel ? (
-                <>
-                  {" "}
-                  Canal seleccionado:{" "}
-                  {sentChannel === "whatsapp" ? "WhatsApp" : "correo electrónico"}.
-                </>
-              ) : null}
             </div>
           ) : null}
 
-          <div className="grid gap-3 sm:grid-cols-2">
+          <div>
             <Button
               type="submit"
-              name="channel"
-              value="whatsapp"
               disabled={submitStatus === "loading"}
-              className="h-11 rounded-md bg-primary text-primary-foreground hover:bg-[var(--brand-strong)]"
-            >
-              <MessageCircle data-icon="inline-start" />
-              {submitStatus === "loading" ? "Enviando..." : "Enviar por WhatsApp"}
-            </Button>
-            <Button
-              type="submit"
-              name="channel"
-              value="email"
-              variant="outline"
-              disabled={submitStatus === "loading"}
-              className="h-11 rounded-md border-primary/40 text-foreground hover:border-primary hover:bg-accent"
+              className="h-11 w-full rounded-md bg-primary text-primary-foreground hover:bg-[var(--brand-strong)]"
             >
               <Mail data-icon="inline-start" />
-              Enviar por correo
+              {submitStatus === "loading" ? "Enviando..." : "Enviar por correo"}
             </Button>
           </div>
         </form>
@@ -1071,7 +1014,7 @@ function LeadForm() {
             </div>
           </Field>
           <Field>
-            <FieldLabel htmlFor="phone">WhatsApp o teléfono</FieldLabel>
+            <FieldLabel htmlFor="phone">Teléfono</FieldLabel>
             <Input
               id="phone"
               inputMode="tel"
