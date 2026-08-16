@@ -1575,11 +1575,17 @@ export function LandingPage() {
                     key={service.title}
                     className={cn(
                       "flex h-full flex-col rounded-lg border border-border bg-white p-5 shadow-sm",
-                      service.featured && "border-primary bg-secondary/55 xl:col-span-2"
+                      service.featured &&
+                        "border-primary bg-[#4d5669] shadow-[0_14px_35px_rgba(77,86,105,0.2)] xl:col-span-2"
                     )}
                   >
                     <div className="flex items-start justify-between gap-4">
-                      <span className="grid size-11 shrink-0 place-items-center rounded-full bg-accent text-primary">
+                      <span
+                        className={cn(
+                          "grid size-11 shrink-0 place-items-center rounded-full bg-accent text-primary",
+                          service.featured && "bg-primary text-[#4d5669]"
+                        )}
+                      >
                         <Icon className="size-5" />
                       </span>
                       {service.featured ? (
@@ -1588,7 +1594,12 @@ export function LandingPage() {
                         </span>
                       ) : null}
                     </div>
-                    <h4 className="mt-5 text-lg font-bold leading-6 text-foreground">
+                    <h4
+                      className={cn(
+                        "mt-5 text-lg font-bold leading-6 text-foreground",
+                        service.featured && "text-white"
+                      )}
+                    >
                       {service.title}
                     </h4>
                     {service.bundleItems ? (
@@ -1602,8 +1613,13 @@ export function LandingPage() {
                                   <Plus className="size-4" />
                                 </span>
                               ) : null}
-                              <div className="flex items-center gap-3 rounded-md border border-primary/25 bg-white p-4">
-                                <span className="grid size-10 shrink-0 place-items-center rounded-full bg-accent text-primary">
+                              <div
+                                className={cn(
+                                  "flex items-center gap-3 rounded-md border border-primary/25 p-4",
+                                  index % 2 === 0 ? "bg-white" : "bg-[#e8fbfc]"
+                                )}
+                              >
+                                <span className="grid size-10 shrink-0 place-items-center rounded-full bg-primary/15 text-primary">
                                   <BundleIcon className="size-5" />
                                 </span>
                                 <div>
@@ -1623,7 +1639,12 @@ export function LandingPage() {
                       )}
                     >
                       {service.originalPrice ? (
-                        <span className="pb-1 text-sm font-semibold text-muted-foreground line-through">
+                        <span
+                          className={cn(
+                            "pb-1 text-sm font-semibold text-muted-foreground line-through",
+                            service.featured && "text-white/65"
+                          )}
+                        >
                           {service.originalPrice}
                         </span>
                       ) : null}
@@ -1634,7 +1655,12 @@ export function LandingPage() {
                         </span>
                       ) : null}
                     </div>
-                    <p className="mt-3 flex-1 text-sm font-medium leading-6 text-muted-foreground">
+                    <p
+                      className={cn(
+                        "mt-3 flex-1 text-sm font-medium leading-6 text-muted-foreground",
+                        service.featured && "text-white/85"
+                      )}
+                    >
                       {service.body}
                     </p>
                     {service.note ? (
@@ -1654,7 +1680,11 @@ export function LandingPage() {
                           : `Solicitar ${service.title}`
                       }
                       onClick={() => openSchedule(service.title)}
-                      className="mt-5 h-10 w-full rounded-md border-primary/35 bg-white hover:bg-accent"
+                      className={cn(
+                        "mt-5 h-10 w-full rounded-md border-primary/35 bg-white hover:bg-accent",
+                        service.featured &&
+                          "border-primary bg-primary font-bold text-[#4d5669] hover:bg-white"
+                      )}
                     >
                       {service.featured ? "Solicitar servicios" : "Solicitar"}
                       <ArrowRight data-icon="inline-end" />

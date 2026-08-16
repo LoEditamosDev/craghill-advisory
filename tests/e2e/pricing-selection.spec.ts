@@ -59,4 +59,17 @@ test("explains that Banking and Payments is a discounted two-service bundle", as
   await expect(
     bundle.getByRole("button", { name: "Solicitar servicios" })
   ).toBeVisible();
+
+  await expect
+    .poll(() =>
+      bundle.evaluate((element) => getComputedStyle(element).backgroundColor)
+    )
+    .toBe("rgb(77, 86, 105)");
+  await expect
+    .poll(() =>
+      bundle
+        .getByRole("button", { name: "Solicitar servicios" })
+        .evaluate((element) => getComputedStyle(element).backgroundColor)
+    )
+    .toBe("rgb(13, 210, 220)");
 });
