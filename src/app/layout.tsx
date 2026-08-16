@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
 import { Montserrat } from "next/font/google";
+
+import { siteConfig } from "@/lib/site";
+
 import "./globals.css";
 
 const montserrat = Montserrat({
@@ -9,9 +12,54 @@ const montserrat = Montserrat({
 });
 
 export const metadata: Metadata = {
-  title: "Craghill Advisory | LLC en Estados Unidos",
-  description:
-    "Constitución de LLC en Estados Unidos para emprendedores no residentes, con soporte en español y proceso remoto.",
+  metadataBase: new URL(siteConfig.url),
+  title: siteConfig.title,
+  description: siteConfig.description,
+  applicationName: siteConfig.name,
+  category: "business services",
+  keywords: [
+    "LLC en Estados Unidos",
+    "crear LLC para no residentes",
+    "formación de LLC",
+    "EIN Estados Unidos",
+    "cumplimiento LLC",
+    "Registered Agent",
+  ],
+  alternates: { canonical: "/" },
+  openGraph: {
+    type: "website",
+    locale: "es_US",
+    url: "/",
+    siteName: siteConfig.name,
+    title: siteConfig.title,
+    description: siteConfig.description,
+    images: [
+      {
+        url: "/hero-placeholder.png",
+        alt: "Craghill Advisory: servicios para constituir una LLC en Estados Unidos",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: siteConfig.title,
+    description: siteConfig.description,
+    images: ["/hero-placeholder.png"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
+  },
+  verification: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION
+    ? { google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION }
+    : undefined,
 };
 
 export default function RootLayout({
