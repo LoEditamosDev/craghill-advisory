@@ -8,13 +8,16 @@ import {
   ArrowRight,
   BadgeCheck,
   BarChart3,
+  BellRing,
   Building2,
   CalendarCheck,
   CheckCircle2,
   CircleDollarSign,
   Clock3,
+  CreditCard,
   FileCheck2,
   FileText,
+  Files,
   Headphones,
   Landmark,
   Mail,
@@ -26,6 +29,7 @@ import {
   Send,
   ShieldCheck,
   Sparkles,
+  WalletCards,
   X,
 } from "lucide-react";
 
@@ -127,6 +131,12 @@ const consultationTypeOptions = [
   "Formar una LLC",
   "EIN / Tax ID",
   "Compliance mensual",
+  "Monitoring",
+  "Presentación Fiscal Anual",
+  "Renovación de Agente Registrado",
+  "Gestión para Cuenta Bancaria Empresarial",
+  "Gestión para Procesador de Pagos",
+  "Banking + Payments",
   "BOI Report",
   "Cuenta bancaria empresarial",
   "Pasarelas de pago",
@@ -266,7 +276,9 @@ const plans = [
     name: "PLAN LAUNCH",
     price: "$499",
     frequency: "Pago único",
+    tagline: "Todo lo necesario para crear tu LLC.",
     cta: "Formar mi LLC",
+    serviceInterest: "Formar una LLC",
     icons: [Building2, FileCheck2, CircleDollarSign],
     features: [
       "Constitución de tu LLC en Estados Unidos",
@@ -282,7 +294,9 @@ const plans = [
     name: "SUSCRIPCIÓN COMPLIANCE",
     price: "$99",
     frequency: "/mes",
+    tagline: "Cumplimiento y mantenimiento continuo.",
     cta: "Suscribirme",
+    serviceInterest: "Compliance mensual",
     icons: [ShieldCheck, CalendarCheck, Headphones],
     features: [
       "Presentación de Form 5472 + 1120 si aplica",
@@ -293,6 +307,61 @@ const plans = [
       "Soporte continuo en español",
       "Acompañamiento ante requerimientos",
     ],
+  },
+  {
+    name: "MONITORING",
+    price: "$29",
+    frequency: "/mes",
+    tagline: "Vigilancia y alertas para actuar a tiempo.",
+    cta: "Activar Monitoring",
+    serviceInterest: "Monitoring",
+    icons: [BellRing, CalendarCheck, FileText],
+    features: [
+      "Alertas de cumplimiento y fechas importantes",
+      "Preparación organizada para el período fiscal",
+      "Aviso de renovación del Agente Registrado",
+      "Análisis de correspondencia oficial",
+      "Actualizaciones regulatorias relevantes",
+      "Todo explicado claramente en español",
+    ],
+    disclaimer:
+      "Incluye monitoreo, alertas, información y orientación. No incluye presentación de formularios fiscales, renovación del Agente Registrado, tasas gubernamentales ni trámites profesionales adicionales.",
+  },
+];
+
+const additionalServices = [
+  {
+    title: "Presentación Fiscal Anual",
+    price: "Desde $299",
+    body: "Preparación y presentación de Form 5472 + Form 1120 ante el IRS, cuando correspondan.",
+    note: "El precio base aplica a operaciones simples con información completa y organizada.",
+    icon: FileCheck2,
+  },
+  {
+    title: "Renovación de Agente Registrado",
+    price: "$199/año",
+    body: "Renovación anual para mantener vigente la representación requerida por el estado de constitución.",
+    icon: ShieldCheck,
+  },
+  {
+    title: "Gestión para Cuenta Bancaria Empresarial",
+    price: "$149",
+    body: "Orientación y acompañamiento durante la solicitud de una cuenta bancaria para tu LLC.",
+    icon: Landmark,
+  },
+  {
+    title: "Gestión para Procesador de Pagos",
+    price: "$149",
+    body: "Acompañamiento para solicitar una solución de procesamiento de pagos adecuada para tu negocio.",
+    icon: CreditCard,
+  },
+  {
+    title: "Banking + Payments",
+    price: "$249",
+    body: "Cuenta bancaria y procesador de pagos en un solo servicio, con acompañamiento en ambas solicitudes.",
+    note: "Ahorras $49",
+    icon: WalletCards,
+    featured: true,
   },
 ];
 
@@ -536,10 +605,12 @@ function SectionReveal({
   children,
   className,
   id,
+  viewportAmount = 0.18,
 }: {
   children: ReactNode;
   className?: string;
   id?: string;
+  viewportAmount?: number;
 }) {
   const reduceMotion = useReducedMotion();
 
@@ -549,7 +620,7 @@ function SectionReveal({
       className={className}
       initial={reduceMotion ? false : { opacity: 0, y: 28 }}
       whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.18 }}
+      viewport={{ once: true, amount: viewportAmount }}
       transition={{ duration: 0.6, ease: "easeOut" }}
     >
       {children}
@@ -663,11 +734,16 @@ function FlagSwatch({ iso }: { iso: string }) {
 function ScheduleDialog({
   open,
   onOpenChange,
+  initialService,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  initialService: string;
 }) {
-  const [form, setForm] = useState<ScheduleFormState>(initialScheduleForm);
+  const [form, setForm] = useState<ScheduleFormState>(() => ({
+    ...initialScheduleForm,
+    serviceInterest: initialService,
+  }));
   const [submitStatus, setSubmitStatus] = useState<
     "idle" | "loading" | "success" | "error"
   >("idle");
@@ -816,8 +892,8 @@ function ScheduleDialog({
                 }))
               }
             >
-              {residenceCountries.map((country) => (
-                <option key={country} value={country}>
+              {residenceCountries.map((country, index) => (
+                <option key={`${country}-${index}`} value={country}>
                   {country}
                 </option>
               ))}
@@ -1111,6 +1187,14 @@ function LeadForm() {
 export function LandingPage() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scheduleOpen, setScheduleOpen] = useState(false);
+  const [selectedService, setSelectedService] = useState(
+    "Quiero orientación general"
+  );
+
+  function openSchedule(service = "Quiero orientación general") {
+    setSelectedService(service);
+    setScheduleOpen(true);
+  }
 
   return (
     <main id="inicio" className="min-h-screen bg-background text-foreground">
@@ -1132,7 +1216,7 @@ export function LandingPage() {
             <ScheduleButton
               className="min-w-0"
               variant="primary"
-              onClick={() => setScheduleOpen(true)}
+              onClick={() => openSchedule()}
             >
               Agendar consulta
             </ScheduleButton>
@@ -1164,7 +1248,7 @@ export function LandingPage() {
                 variant="primary"
                 onClick={() => {
                   setMenuOpen(false);
-                  setScheduleOpen(true);
+                  openSchedule();
                 }}
               >
                 Agendar consulta
@@ -1205,7 +1289,7 @@ export function LandingPage() {
               <CtaLink variant="primary">Formar mi LLC</CtaLink>
               <ScheduleButton
                 variant="outline"
-                onClick={() => setScheduleOpen(true)}
+                onClick={() => openSchedule()}
               >
                 Agendar consulta
               </ScheduleButton>
@@ -1336,14 +1420,27 @@ export function LandingPage() {
         </div>
       </SectionReveal>
 
-      <SectionReveal id="planes" className="scroll-mt-24 bg-white pb-16">
+      <SectionReveal
+        id="planes"
+        viewportAmount={0.04}
+        className="scroll-mt-24 bg-white pb-16"
+      >
         <div className={wideContainerClass}>
           <h2 className="text-center text-3xl font-bold text-foreground">
             Planes simples y transparentes
           </h2>
-          <div className="mt-8 grid gap-8 lg:grid-cols-2">
+          <p className="mx-auto mt-3 max-w-2xl text-center text-sm font-medium leading-7 text-muted-foreground">
+            Elige el nivel de acompañamiento que necesita tu empresa hoy.
+          </p>
+          <div className="mt-8 grid items-stretch gap-6 md:grid-cols-2 xl:grid-cols-3">
             {plans.map((plan) => (
-              <Card key={plan.name} className="rounded-lg border-primary/45 bg-white shadow-sm">
+              <Card
+                key={plan.name}
+                className={cn(
+                  "h-full rounded-lg border-primary/35 bg-white shadow-sm",
+                  plan.name === "MONITORING" && "border-primary bg-secondary/55"
+                )}
+              >
                 <CardHeader className="items-center text-center">
                   <CardTitle className="text-sm font-bold tracking-wide">{plan.name}</CardTitle>
                   <div className="flex items-end justify-center gap-1">
@@ -1356,11 +1453,10 @@ export function LandingPage() {
                   </div>
                   {!plan.frequency.startsWith("/") ? (
                     <p className="text-sm font-semibold text-foreground">{plan.frequency}</p>
-                  ) : (
-                    <p className="text-sm font-semibold text-foreground">
-                      Cumplimiento y mantenimiento
-                    </p>
-                  )}
+                  ) : null}
+                  <p className="min-h-10 max-w-xs text-sm font-medium leading-5 text-muted-foreground">
+                    {plan.tagline}
+                  </p>
                   <div className="flex justify-center gap-3 pt-2">
                     {plan.icons.map((Icon, iconIndex) => (
                       <span key={`${plan.name}-${iconIndex}`} className="grid size-10 place-items-center rounded-full bg-accent text-primary">
@@ -1369,7 +1465,7 @@ export function LandingPage() {
                     ))}
                   </div>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="flex-1">
                   <ul className="flex flex-col gap-3">
                     {plan.features.map((feature) => (
                       <li key={feature} className="flex gap-3 text-sm font-medium leading-6 text-foreground/78">
@@ -1378,9 +1474,21 @@ export function LandingPage() {
                       </li>
                     ))}
                   </ul>
+                  {plan.disclaimer ? (
+                    <details className="mt-5 rounded-md border border-primary/20 bg-white/80 px-4 py-3 text-xs text-muted-foreground">
+                      <summary className="cursor-pointer font-bold text-foreground">
+                        Qué incluye Monitoring
+                      </summary>
+                      <p className="mt-2 leading-5">{plan.disclaimer}</p>
+                    </details>
+                  ) : null}
                 </CardContent>
                 <CardFooter className="border-0 bg-transparent px-6 pb-6">
-                  <Button type="button" className="h-10 w-full rounded-md bg-primary text-primary-foreground hover:bg-[var(--brand-strong)]">
+                  <Button
+                    type="button"
+                    onClick={() => openSchedule(plan.serviceInterest)}
+                    className="h-10 w-full rounded-md bg-primary text-primary-foreground hover:bg-[var(--brand-strong)]"
+                  >
                     {plan.cta}
                     <ArrowRight data-icon="inline-end" />
                   </Button>
@@ -1440,6 +1548,93 @@ export function LandingPage() {
                 );
               })}
             </div>
+          </div>
+          <div className="mt-14">
+            <div className="mx-auto max-w-3xl text-center">
+              <span className="text-sm font-bold uppercase tracking-wide text-primary">
+                Servicios adicionales
+              </span>
+              <h3 className="mt-2 text-3xl font-bold text-foreground">
+                Apoyo puntual para cada etapa de tu LLC
+              </h3>
+              <p className="mt-3 text-sm font-medium leading-7 text-muted-foreground">
+                Soluciones específicas para operar y mantener tu empresa sin contratar un plan completo.
+              </p>
+            </div>
+            <div className="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+              {additionalServices.map((service) => {
+                const Icon = service.icon;
+                return (
+                  <article
+                    key={service.title}
+                    className={cn(
+                      "flex h-full flex-col rounded-lg border border-border bg-white p-5 shadow-sm",
+                      service.featured && "border-primary bg-secondary/55 xl:col-span-2"
+                    )}
+                  >
+                    <div className="flex items-start justify-between gap-4">
+                      <span className="grid size-11 shrink-0 place-items-center rounded-full bg-accent text-primary">
+                        <Icon className="size-5" />
+                      </span>
+                      {service.featured ? (
+                        <span className="rounded-full bg-primary px-3 py-1 text-xs font-bold text-primary-foreground">
+                          Mejor valor
+                        </span>
+                      ) : null}
+                    </div>
+                    <h4 className="mt-5 text-lg font-bold leading-6 text-foreground">
+                      {service.title}
+                    </h4>
+                    <p className="mt-2 text-2xl font-bold text-primary">{service.price}</p>
+                    <p className="mt-3 flex-1 text-sm font-medium leading-6 text-muted-foreground">
+                      {service.body}
+                    </p>
+                    {service.note ? (
+                      <p className={cn(
+                        "mt-3 text-xs font-semibold leading-5 text-muted-foreground",
+                        service.featured && "text-primary"
+                      )}>
+                        {service.note}
+                      </p>
+                    ) : null}
+                    <Button
+                      type="button"
+                      variant="outline"
+                      aria-label={`Solicitar ${service.title}`}
+                      onClick={() => openSchedule(service.title)}
+                      className="mt-5 h-10 w-full rounded-md border-primary/35 bg-white hover:bg-accent"
+                    >
+                      Solicitar
+                      <ArrowRight data-icon="inline-end" />
+                    </Button>
+                  </article>
+                );
+              })}
+            </div>
+            <div className="mt-5 grid gap-5 rounded-lg border border-primary/25 bg-secondary p-6 lg:grid-cols-[1fr_auto] lg:items-center">
+              <div>
+                <div className="flex items-center gap-3">
+                  <span className="grid size-10 shrink-0 place-items-center rounded-full bg-white text-primary">
+                    <Files className="size-5" />
+                  </span>
+                  <h4 className="text-xl font-bold text-foreground">¿Necesitas otra gestión?</h4>
+                </div>
+                <p className="mt-3 max-w-4xl text-sm font-medium leading-6 text-muted-foreground">
+                  Podemos ayudarte con modificaciones de tu LLC, cambios en el Operating Agreement, certificados y otras gestiones. Evaluamos tu necesidad y confirmamos el costo antes de comenzar.
+                </p>
+              </div>
+              <Button
+                type="button"
+                onClick={() => openSchedule("Otro")}
+                className="h-11 rounded-md bg-primary px-5 text-primary-foreground hover:bg-[var(--brand-strong)]"
+              >
+                Consultar otra gestión
+                <ArrowRight data-icon="inline-end" />
+              </Button>
+            </div>
+            <p className="mx-auto mt-5 max-w-5xl text-center text-xs font-medium leading-5 text-muted-foreground">
+              La apertura de cuentas bancarias y la aprobación de procesadores de pago dependen de los requisitos, verificaciones y decisión final de cada institución o proveedor.
+            </p>
           </div>
           <div className="mt-8 grid gap-4 md:grid-cols-3">
             {planBenefits.map((benefit) => {
@@ -1662,7 +1857,7 @@ export function LandingPage() {
           </div>
           <ScheduleButton
             variant="light"
-            onClick={() => setScheduleOpen(true)}
+            onClick={() => openSchedule()}
           >
             Agendar consulta gratuita
           </ScheduleButton>
@@ -1740,7 +1935,12 @@ export function LandingPage() {
         </p>
       </footer>
 
-      <ScheduleDialog open={scheduleOpen} onOpenChange={setScheduleOpen} />
+      <ScheduleDialog
+        key={selectedService}
+        open={scheduleOpen}
+        onOpenChange={setScheduleOpen}
+        initialService={selectedService}
+      />
     </main>
   );
 }
