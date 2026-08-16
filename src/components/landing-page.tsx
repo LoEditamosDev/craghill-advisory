@@ -25,6 +25,7 @@ import {
   Menu,
   MessageCircle,
   Phone,
+  Plus,
   Camera,
   Send,
   ShieldCheck,
@@ -358,10 +359,15 @@ const additionalServices = [
   {
     title: "Banking + Payments",
     price: "$249",
-    body: "Cuenta bancaria y procesador de pagos en un solo servicio, con acompañamiento en ambas solicitudes.",
+    originalPrice: "$298",
+    body: "Contrata ambas gestiones juntas y recibe acompañamiento durante los dos procesos de solicitud.",
     note: "Ahorras $49",
     icon: WalletCards,
     featured: true,
+    bundleItems: [
+      { title: "Cuenta bancaria", price: "$149", icon: Landmark },
+      { title: "Procesador de pagos", price: "$149", icon: CreditCard },
+    ],
   },
 ];
 
@@ -1578,14 +1584,56 @@ export function LandingPage() {
                       </span>
                       {service.featured ? (
                         <span className="rounded-full bg-primary px-3 py-1 text-xs font-bold text-primary-foreground">
-                          Mejor valor
+                          Bundle · 2 servicios
                         </span>
                       ) : null}
                     </div>
                     <h4 className="mt-5 text-lg font-bold leading-6 text-foreground">
                       {service.title}
                     </h4>
-                    <p className="mt-2 text-2xl font-bold text-primary">{service.price}</p>
+                    {service.bundleItems ? (
+                      <div className="mt-4 grid gap-3 sm:grid-cols-[1fr_auto_1fr] sm:items-center">
+                        {service.bundleItems.map((item, index) => {
+                          const BundleIcon = item.icon;
+                          return (
+                            <div key={item.title} className="contents">
+                              {index > 0 ? (
+                                <span className="mx-auto grid size-8 place-items-center rounded-full bg-primary text-primary-foreground">
+                                  <Plus className="size-4" />
+                                </span>
+                              ) : null}
+                              <div className="flex items-center gap-3 rounded-md border border-primary/25 bg-white p-4">
+                                <span className="grid size-10 shrink-0 place-items-center rounded-full bg-accent text-primary">
+                                  <BundleIcon className="size-5" />
+                                </span>
+                                <div>
+                                  <p className="text-sm font-bold text-foreground">{item.title}</p>
+                                  <p className="text-lg font-bold text-primary">{item.price}</p>
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    ) : null}
+                    <div
+                      className={cn(
+                        "mt-2",
+                        service.featured && "flex flex-wrap items-end gap-3"
+                      )}
+                    >
+                      {service.originalPrice ? (
+                        <span className="pb-1 text-sm font-semibold text-muted-foreground line-through">
+                          {service.originalPrice}
+                        </span>
+                      ) : null}
+                      <p className="text-2xl font-bold text-primary">{service.price}</p>
+                      {service.featured ? (
+                        <span className="pb-1 text-xs font-bold uppercase tracking-wide text-primary">
+                          precio conjunto
+                        </span>
+                      ) : null}
+                    </div>
                     <p className="mt-3 flex-1 text-sm font-medium leading-6 text-muted-foreground">
                       {service.body}
                     </p>
@@ -1600,11 +1648,15 @@ export function LandingPage() {
                     <Button
                       type="button"
                       variant="outline"
-                      aria-label={`Solicitar ${service.title}`}
+                      aria-label={
+                        service.featured
+                          ? "Solicitar servicios Banking + Payments"
+                          : `Solicitar ${service.title}`
+                      }
                       onClick={() => openSchedule(service.title)}
                       className="mt-5 h-10 w-full rounded-md border-primary/35 bg-white hover:bg-accent"
                     >
-                      Solicitar
+                      {service.featured ? "Solicitar servicios" : "Solicitar"}
                       <ArrowRight data-icon="inline-end" />
                     </Button>
                   </article>

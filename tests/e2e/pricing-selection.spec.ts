@@ -37,3 +37,26 @@ test("reveals the complete pricing section on a mobile viewport", async ({ page 
     .poll(async () => Number(await pricing.evaluate((element) => getComputedStyle(element).opacity)))
     .toBeGreaterThan(0.9);
 });
+
+test("explains that Banking and Payments is a discounted two-service bundle", async ({
+  page,
+}) => {
+  await page.goto("/#planes");
+
+  const bundle = page
+    .getByRole("article")
+    .filter({ has: page.getByRole("heading", { name: "Banking + Payments" }) });
+
+  await expect(
+    bundle.getByText("Cuenta bancaria", { exact: true })
+  ).toBeVisible();
+  await expect(
+    bundle.getByText("Procesador de pagos", { exact: true })
+  ).toBeVisible();
+  await expect(bundle.getByText("$298", { exact: true })).toBeVisible();
+  await expect(bundle.getByText("$249", { exact: true })).toBeVisible();
+  await expect(bundle.getByText("Ahorras $49", { exact: true })).toBeVisible();
+  await expect(
+    bundle.getByRole("button", { name: "Solicitar servicios" })
+  ).toBeVisible();
+});
